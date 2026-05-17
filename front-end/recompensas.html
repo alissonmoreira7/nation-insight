@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NationInsight — Central de Recompensas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/recompensas.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+  </head>
+  
+  <body>
+    <div id="topbar-container"></div>
+
+    <!-- LAYOUT -->
+    <div class="layout">
+
+      <div id="sidebar-container"></div>
+
+      <!-- MAIN -->
+      <main class="main">
+
+        <!-- HEADER DA PÁGINA -->
+        <div class="page-header">
+          <h1>Central de Recompensas</h1>
+          <p>Troque seus pontos por benefícios exclusivos</p>
+        </div>
+
+        <!-- HERO DE PONTOS -->
+        <div class="pontos-hero">
+          <div>
+            <div class="pontos-hero-label">Seus Pontos Disponíveis</div>
+            <div class="pontos-hero-valor">
+              <span class="star">☆</span>
+              <span id="pontosHero">450</span>
+            </div>
+            <div class="pontos-hero-sub" id="heroSub">Você pode resgatar 4 recompensas</div>
+          </div>
+        </div>
+
+        <!-- PRÓXIMA META -->
+        <div class="meta-card">
+          <div class="meta-header">☆ Próxima Meta</div>
+
+          <div class="meta-sub">Continue contribuindo para desbloquear</div>
+
+          <div class="meta-item">
+            <div class="meta-icon">📦</div>
+            <div class="meta-info">
+              <div class="meta-nome">Equipamento Home Office</div>
+              <div class="meta-pts">500 pontos</div>
+            </div>
+            <div class="meta-faltam" id="metaFaltam">Faltam 50 pontos</div>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="filtros">
+          <button class="filtro-btn active" onclick="filtrar('disponiveis', this)">Disponíveis (<span id="countDisp">4</span>)</button>
+          <button class="filtro-btn" onclick="filtrar('todas', this)">Todas (<span id="countTodas">6</span>)</button>
+          <button class="filtro-btn" onclick="filtrar('historico', this)">Histórico</button>
+        </div>
+
+        <!-- GRID -->
+        <div class="rewards-grid" id="rewardsGrid"></div>
+
+        <!-- HISTÓRICO (oculto inicialmente) -->
+        <div class="historico-list" id="historicoList" style="display:none"></div>
+
+      </main>
+    </div>
+
+    <!-- MODAL CONFIRMAÇÃO -->
+    <div class="modal-overlay" id="modalConfirm">
+      <div class="modal">
+        <div class="modal-emoji">🎁</div>
+        <div class="modal-title" id="modalTitle">Resgatar Vale-Presente?</div>
+        <div class="modal-desc" id="modalDesc">Você está prestes a resgatar este benefício.</div>
+        <div class="modal-pts" id="modalPts">100 pontos</div>
+        <div class="modal-actions">
+          <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+          <button class="btn-confirmar" onclick="confirmarResgate()">Confirmar Resgate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL SUCESSO -->
+    <div class="modal-overlay" id="modalSucesso">
+      <div class="modal">
+        <div class="modal-emoji">🎉</div>
+        <div class="modal-title">Resgate Realizado!</div>
+        <div class="modal-desc" id="modalSucessoDesc">Seu benefício foi resgatado com sucesso. Em breve você receberá mais informações.</div>
+        <div style="margin-top:8px">
+          <button class="btn-confirmar" style="width:100%;padding:12px" onclick="fecharSucesso()">Ótimo!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-wrap" id="toastWrap"></div>
+
+    <script src="js/recompensas.js"></script>
+    
+    <script src="js/injetahtml.js"></script>
+
+    <script>
+        carregarComponente('components/topbar.html', 'topbar-container');
+        carregarComponente('components/sidebar.html', 'sidebar-container', 'nav-recompensas');
+    </script>
+  </body>
+</html>

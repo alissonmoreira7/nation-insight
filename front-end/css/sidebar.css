@@ -1,0 +1,41 @@
+/* ==========================================================================
+   SIDEBAR
+   ========================================================================== */
+
+.sidebar {
+    width: var(--sidebar-w);
+    background: var(--azul);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 0;
+    position: fixed;
+    top: 56px; 
+    bottom: 0; 
+    left: 0;
+    overflow-y: auto;
+}
+
+.sidebar .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    color: #B4B4B4; 
+    text-decoration: none; 
+    font-size: 1rem;
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.sidebar .nav-icon {
+    width: 24px;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.sidebar .nav-item.active {
+    background-color: rgba(255, 255, 255, 0.08); 
+    color: #F5C542;
+    border-left-color: #F5C542;
+    font-weight: 600;
+}
