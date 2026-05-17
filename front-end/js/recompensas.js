@@ -12,19 +12,17 @@ function getState() {
 
   const pontosGlobais = localStorage.getItem('nation_user_points');
   if (pontosGlobais !== null) {
-      s.pontos = parseInt(pontosGlobais); // Puxa os pontos do Dashboard
+      s.pontos = parseInt(pontosGlobais); 
   } else {
-      localStorage.setItem('nation_user_points', s.pontos); // Salva 450 como inicial lá também
+      localStorage.setItem('nation_user_points', s.pontos);
   }
 
   return s;
 }
 
 function saveState(s) { 
-    // Salva o histórico e as recompensas
     localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); 
     
-    // 🔴 MÁGICA AQUI: Salva os pontos globais para o Dashboard atualizar também
     localStorage.setItem('nation_user_points', s.pontos);
 }
 
@@ -195,8 +193,6 @@ function confirmarResgate() {
   document.getElementById('modalSucessoDesc').textContent =
     `"${r.nome}" foi resgatado com sucesso! Você usou ${r.pts} pontos e agora tem ${state.pontos} pontos.`;
   document.getElementById('modalSucesso').classList.add('open');
-
-  render();
 }
 
 function fecharSucesso() {

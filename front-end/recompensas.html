@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+
     <link rel="stylesheet" href="css/recompensas.css">
     <link rel="stylesheet" href="css/sidebar.css">
   </head>
@@ -111,10 +111,14 @@
     <script src="js/recompensas.js"></script>
     
     <script src="js/injetahtml.js"></script>
-
+    
     <script>
         carregarComponente('components/topbar.html', 'topbar-container');
         carregarComponente('components/sidebar.html', 'sidebar-container', 'nav-recompensas');
+
+        setTimeout(() => {
+            render();
+        }, 500);
     </script>
   </body>
 </html>
