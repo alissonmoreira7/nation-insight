@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NationInsight — Minhas Ideias</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/ideias.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/topbar.css">
+  </head>
+
+  <body>
+    <div id="topbar-container"></div>
+
+    <div class="layout">
+
+    <div id="sidebar-container"></div>
+
+      <main class="main">
+
+        <!-- HERO BANNER -->
+        <div class="hero-banner">
+          <div>
+            <div class="hero-greeting">Minhas Ideias</div>
+            <div class="hero-sub">Gerencie e acompanhe todas as suas contribuições.</div>
+          </div>
+          <button class="btn-nova-sugestao" onclick="abrirModalNova()">+ Nova Ideia</button>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+
+          <!-- KPIs -->
+          <div class="kpis-grid">
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Total Submetidas</span>
+                <span class="kpi-icon">💡</span>
+              </div>
+              <div class="kpi-valor" id="kpiTotal">0</div>
+              <div class="kpi-sub">todas as contribuições</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Em Análise</span>
+                <span class="kpi-icon" style="color:var(--laranja)">⏱</span>
+              </div>
+              <div class="kpi-valor" style="color:var(--laranja)" id="kpiAnalise">0</div>
+              <div class="kpi-sub">aguardando avaliação</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Aprovadas</span>
+                <span class="kpi-icon" style="color:var(--verde)">✅</span>
+              </div>
+              <div class="kpi-valor" style="color:var(--verde)" id="kpiAprovadas">0</div>
+              <div class="kpi-sub">ideias implementadas</div>
+            </div>
+
+            <div class="kpi-card gold">
+              <div class="kpi-header">
+                <span class="kpi-label">Pontos Ganhos</span>
+                <span class="kpi-icon">⭐</span>
+              </div>
+              <div class="kpi-valor" id="kpiPontos">0</div>
+              <div class="kpi-sub" id="kpiRanking">Ranking #3 geral</div>
+            </div>
+          </div>
+
+          <!-- TOOLBAR -->
+          <div class="toolbar">
+            <div class="filtros">
+              <button class="filtro-btn active" onclick="filtrar('todas', this)">Todas (<span id="cntTodas">0</span>)</button>
+              <button class="filtro-btn" onclick="filtrar('Pendente', this)">Pendentes (<span id="cntPendente">0</span>)</button>
+              <button class="filtro-btn" onclick="filtrar('Em Análise', this)">Em Análise (<span id="cntAnalise">0</span>)</button>
+              <button class="filtro-btn" onclick="filtrar('Aprovada', this)">Aprovadas (<span id="cntAprovada">0</span>)</button>
+              <button class="filtro-btn" onclick="filtrar('Rejeitada', this)">Rejeitadas (<span id="cntRejeitada">0</span>)</button>
+            </div>
+
+            <div class="toolbar-right">
+              <select class="sort-select" id="sortSelect" onchange="renderLista()">
+                <option value="recente">Mais Recentes</option>
+                <option value="antigo">Mais Antigas</option>
+                <option value="pontos">Maior Pontuação</option>
+                <option value="impacto">Maior Impacto</option>
+              </select>
+
+              <div class="view-btns">
+                <button class="view-btn active" id="btnLista" onclick="setView('lista')" title="Lista">☰</button>
+                <button class="view-btn" id="btnGrid" onclick="setView('grid')" title="Grade">⊞</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- LISTA / GRID -->
+          <div id="ideiasContainer"></div>
+
+        </div>
+      </main>
+    </div>
+
+    <!-- ── MODAL: VER DETALHES ── -->
+    <div class="modal-overlay" id="modalDetalhes">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title" id="detTitulo"></div>
+          <button class="modal-close" onclick="fecharModal('modalDetalhes')">✕</button>
+        </div>
+        
+        <div class="modal-badges" id="detBadges"></div>
+        <div class="modal-section">
+          <div class="modal-section-label">Descrição</div>
+          <div class="modal-desc-text" id="detDesc"></div>
+        </div>
+
+        <div id="detFeedbackWrap"></div>
+        <div class="modal-divider"></div>
+        <div class="modal-section">
+          <div class="modal-section-label">Acompanhamento</div>
+          <div id="detTracker"></div>
+        </div>
+
+        <div class="modal-divider"></div>
+        <div class="modal-section">
+          <div class="modal-section-label">Informações</div>
+          <div class="modal-meta-grid" id="detMeta"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MODAL: NOVA / EDITAR IDEIA ── -->
+    <div class="modal-overlay" id="modalForm">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title" id="formTitulo">Nova Ideia</div>
+          <button class="modal-close" onclick="fecharModal('modalForm')">✕</button>
+        </div>
+
+        <div class="field">
+          <label>Título da Ideia *</label>
+          <input type="text" id="fTitulo" placeholder="Ex: Automação de Relatórios Financeiros com IA" maxlength="100" oninput="updateChar('fTitulo','charTitulo',100)">
+          <div class="char-count"><span id="charTitulo">0</span>/100</div>
+        </div>
+
+        <div class="field">
+            <label>Categoria *</label>
+            <select id="fCategoria">
+                <option value="">Selecionar categoria</option>
+                <option>Tecnologia</option>
+                <option>Processos</option>
+                <option>Análise de Dados</option>
+                <option>RH</option>
+                <option>Financeiro</option>
+                <option>Marketing</option>
+                <option>Operações</option>
+            </select>
+        </div>
+
+        <div class="field">
+          <label>Descrição Detalhada *</label>
+          <textarea id="fDesc" placeholder="Descreva sua ideia, o problema que resolve, benefícios esperados e como pode ser implementada..." maxlength="600" oninput="updateChar('fDesc','charDesc',600)"></textarea>
+          <div class="char-count"><span id="charDesc">0</span>/600</div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Prazo Estimado de Implementação</label>
+            <select id="fPrazo">
+              <option>Curto prazo (1-3 meses)</option>
+              <option>Médio prazo (3-6 meses)</option>
+              <option>Longo prazo (6-12 meses)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Recursos Necessários</label>
+            <select id="fRecursos">
+              <option>Apenas equipe interna</option>
+              <option>Ferramentas/Softwares</option>
+              <option>Investimento financeiro</option>
+              <option>Parceiros externos</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fecharModal('modalForm')">Cancelar</button>
+          <button class="btn-submit" id="btnFormSubmit" onclick="salvarIdeia()">Submeter Ideia</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MODAL: CONFIRMAR EXCLUSÃO ── -->
+    <div class="modal-overlay" id="modalExcluir">
+      <div class="modal" style="max-width:380px">
+        <div class="modal-confirm">
+          <div class="confirm-icon">🗑️</div>
+          <div class="confirm-title">Excluir Ideia?</div>
+          <div class="confirm-desc" id="excluirDesc">Esta ação não pode ser desfeita. A ideia será removida permanentemente.</div>
+          <div class="modal-actions">
+            <button class="btn-cancel" onclick="fecharModal('modalExcluir')">Cancelar</button>
+            <button class="btn-danger" onclick="confirmarExclusao()">Excluir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-wrap" id="toastWrap"></div>
+    
+    <script src="js/ideias.js"></script>
+    <script src="js/injetahtml.js"></script>
+    <script src="js/sidebar.js"></script>
+
+    <script>
+        carregarComponente('components/sidebar.html', 'sidebar-container', 'nav-ideias');
+        carregarComponente('components/topbar.html', 'topbar-container');
+
+        setTimeout(() => {
+            render();
+        }, 500);
+    </script>
+
+  </body>
+</html>
