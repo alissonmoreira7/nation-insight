@@ -10,6 +10,7 @@
 
     <link rel="stylesheet" href="css/recompensas.css">
     <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/topbar.css">
   </head>
   
   <body>
@@ -109,10 +110,11 @@
     <div class="toast-wrap" id="toastWrap"></div>
 
     <script src="js/recompensas.js"></script>
-    
     <script src="js/injetahtml.js"></script>
+    <script src="js/sidebar.js"></script>
     
     <script>
+        carregarComponente('components/sidebar.html', 'sidebar-container', 'nav-recompensas');
         carregarComponente('components/topbar.html', 'topbar-container');
         carregarComponente('components/sidebar.html', 'sidebar-container', 'nav-recompensas');
 
