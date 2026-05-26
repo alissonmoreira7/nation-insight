@@ -1,94 +1,24 @@
-// ─── ESTADO ──────────────────────────────────────────────────────────────────
-const STORAGE_KEY = 'ni_minhas_ideias';
+// ─── ideias.js — VERSÃO INTEGRADA COM API ────────────────────────────────────
+// Requer: <script src="js/api.js"></script> ANTES deste arquivo no HTML
 
-function defaultState() {
-  return {
-    usuario: { nome: 'Ana Costa', iniciais: 'AC', cargo: 'Análise de Dados', pontos: 450, ranking: 3 },
-    ideias: [
-      {
-        id: 1,
-        titulo: 'Automação de Relatórios Financeiros com IA',
-        categoria: 'Tecnologia',
-        status: 'Em Análise',
-        impacto: 'Alto',
-        comentarios: 8,
-        visualizacoes: 34,
-        desc: 'Implementar sistema de IA para gerar automaticamente relatórios mensais, reduzindo tempo de processamento em 70% e minimizando erros humanos. A solução integraria dados de múltiplos sistemas contábeis e geraria insights automatizados.',
-        prazo: 'Médio prazo (3-6 meses)',
-        recursos: 'Ferramentas/Softwares',
-        data: '15/03/2026',
-        pts: null,
-        feedback: 'Ideia muito relevante! Estamos avaliando a viabilidade técnica e o custo de implementação. Aguarde retorno em até 10 dias úteis.'
-      },
-      {
-        id: 2,
-        titulo: 'Dashboard em Tempo Real para Análise de Mercado',
-        categoria: 'Análise de Dados',
-        status: 'Aprovada',
-        impacto: 'Alto',
-        comentarios: 12,
-        visualizacoes: 67,
-        desc: 'Criar dashboard interativo que consolida dados de múltiplas fontes globais para análise de tendências de mercado em tempo real. Permitirá tomada de decisões mais ágeis pela equipe de investimentos.',
-        prazo: 'Curto prazo (1-3 meses)',
-        recursos: 'Apenas equipe interna',
-        data: '02/03/2026',
-        pts: 80,
-        feedback: 'Excelente proposta! Alinhada com os objetivos estratégicos do trimestre. A equipe de TI já iniciou o planejamento de implementação.'
-      },
-      {
-        id: 3,
-        titulo: 'Otimização de Processos de Onboarding',
-        categoria: 'Processos',
-        status: 'Pendente',
-        impacto: 'Médio',
-        comentarios: 5,
-        visualizacoes: 18,
-        desc: 'Reduzir tempo de integração de novos colaboradores de 30 para 15 dias através de digitalização e automação de documentos. Inclui criação de portal de onboarding e trilhas de aprendizado personalizadas.',
-        prazo: 'Curto prazo (1-3 meses)',
-        recursos: 'Ferramentas/Softwares',
-        data: '20/04/2026',
-        pts: null,
-        feedback: null
-      },
-      {
-        id: 4,
-        titulo: 'Programa de Mentoria entre Departamentos',
-        categoria: 'RH',
-        status: 'Rejeitada',
-        impacto: 'Médio',
-        comentarios: 3,
-        visualizacoes: 12,
-        desc: 'Criar programa estruturado de mentoria cruzada entre departamentos para compartilhamento de conhecimento e desenvolvimento profissional de colaboradores júnior e pleno.',
-        prazo: 'Longo prazo (6-12 meses)',
-        recursos: 'Apenas equipe interna',
-        data: '10/04/2026',
-        pts: null,
-        feedback: 'Proposta interessante, porém já temos uma iniciativa similar em desenvolvimento pelo RH. Sugerimos aguardar a conclusão do programa atual antes de implementar algo paralelo.'
-      },
-    ]
-  };
-}
+let state = {
+  usuario: getUsuario() || { nome: 'Usuário', iniciais: 'U', cargo: '', pontos: 0, ranking: 0 },
+  ideias: []
+};
 
-function getState() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState(); }
-  catch { return defaultState(); }
-}
-function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
-
-let state = getState();
 let filtroAtual = 'todas';
 let viewAtual   = 'lista';
 let buscaAtual  = '';
 let editandoId  = null;
 let excluindoId = null;
 
-// ─── STATUS CONFIG ────────────────────────────────────────────────────────────
+// ─── STATUS CONFIG ─────────────────────────────────────────────────────────────
 
 const statusCfg = {
-  'Pendente':    { cls: 'badge-pendente',   label: '⏳ Pendente',    passos: [true, false, false, false] },
-  'Em Análise':  { cls: 'badge-analise',    label: '🔍 Em Análise',  passos: [true, true,  false, false] },
-  'Aprovada':    { cls: 'badge-aprovada',   label: '✅ Aprovada',    passos: [true, true,  true,  true]  },
-  'Rejeitada':   { cls: 'badge-rejeitada',  label: '❌ Rejeitada',   passos: [true, true,  false, false] },
+  'Pendente':   { cls: 'badge-pendente',  label: '⏳ Pendente',   passos: [true, false, false, false] },
+  'Em Análise': { cls: 'badge-analise',   label: '🔍 Em Análise', passos: [true, true,  false, false] },
+  'Aprovada':   { cls: 'badge-aprovada',  label: '✅ Aprovada',   passos: [true, true,  true,  true]  },
+  'Rejeitada':  { cls: 'badge-rejeitada', label: '❌ Rejeitada',  passos: [true, true,  false, false] },
 };
 const impactoCfg = {
   'Alto':  { cls: 'badge-impacto-alto',  label: '🔴 Impacto Alto'  },
@@ -97,7 +27,41 @@ const impactoCfg = {
 };
 const trackerLabels = ['Submetida', 'Em Análise', 'Aprovada', 'Concluída'];
 
-// ─── RENDER PRINCIPAL ────────────────────────────────────────────────────────
+// ─── INICIALIZAÇÃO (substitui render() direto) ─────────────────────────────────
+
+async function init() {
+  // 1. Verifica autenticação — redireciona se não houver token
+  checkAuth();
+
+  // 2. Preenche dados do usuário vindo do localStorage (login)
+  const usu = getUsuario();
+  if (usu) {
+    state.usuario = usu;
+  }
+
+  // 3. Carrega ideias da API
+  await carregarIdeias();
+}
+
+async function carregarIdeias() {
+  try {
+    mostrarLoading(true);
+    state.ideias = await Ideias.minhas();
+    render();
+  } catch (err) {
+    toast('❌ Erro ao carregar ideias: ' + err.message);
+    console.error(err);
+  } finally {
+    mostrarLoading(false);
+  }
+}
+
+function mostrarLoading(show) {
+  const el = document.getElementById('loadingOverlay');
+  if (el) el.style.display = show ? 'flex' : 'none';
+}
+
+// ─── RENDER PRINCIPAL ──────────────────────────────────────────────────────────
 
 function render() {
   atualizarKPIs();
@@ -109,11 +73,11 @@ function render() {
 
 function atualizarKPIs() {
   const ids = state.ideias;
-  document.getElementById('kpiTotal').textContent    = ids.length;
-  document.getElementById('kpiAnalise').textContent  = ids.filter(i => i.status === 'Em Análise').length;
-  document.getElementById('kpiAprovadas').textContent= ids.filter(i => i.status === 'Aprovada').length;
-  document.getElementById('kpiPontos').textContent   = state.usuario.pontos;
-  document.getElementById('kpiRanking').textContent  = `Ranking #${state.usuario.ranking} geral`;
+  document.getElementById('kpiTotal').textContent     = ids.length;
+  document.getElementById('kpiAnalise').textContent   = ids.filter(i => i.status === 'Em Análise').length;
+  document.getElementById('kpiAprovadas').textContent = ids.filter(i => i.status === 'Aprovada').length;
+  document.getElementById('kpiPontos').textContent    = state.usuario.pontos;
+  document.getElementById('kpiRanking').textContent   = `Ranking #${state.usuario.ranking} geral`;
 }
 
 function atualizarContadores() {
@@ -129,10 +93,8 @@ function renderLista() {
   const sort = document.getElementById('sortSelect').value;
   let lista = [...state.ideias];
 
-  // Filtro status
   if (filtroAtual !== 'todas') lista = lista.filter(i => i.status === filtroAtual);
 
-  // Busca
   if (buscaAtual.trim()) {
     const q = buscaAtual.toLowerCase();
     lista = lista.filter(i =>
@@ -142,7 +104,6 @@ function renderLista() {
     );
   }
 
-  // Ordenação
   if (sort === 'antigo')  lista.sort((a,b) => a.id - b.id);
   else if (sort === 'recente') lista.sort((a,b) => b.id - a.id);
   else if (sort === 'pontos')  lista.sort((a,b) => (b.pts||0) - (a.pts||0));
@@ -203,9 +164,7 @@ function renderCard(ideia) {
         ${ideia.recursos ? `<span class="tag-cat">🔧 ${ideia.recursos}</span>` : ''}
       </div>
       <div class="ideia-desc">${ideia.desc}</div>
-
       <div class="status-tracker">${tracker}</div>
-
       <div class="ideia-footer">
         <div class="ideia-meta">
           <div class="meta-item">💬 <strong>${ideia.comentarios}</strong> comentários</div>
@@ -222,7 +181,7 @@ function renderCard(ideia) {
     </div>`;
 }
 
-// ─── FILTRO / BUSCA / VIEW ────────────────────────────────────────────────────
+// ─── FILTRO / BUSCA / VIEW ─────────────────────────────────────────────────────
 
 function filtrar(status, btn) {
   filtroAtual = status;
@@ -243,15 +202,11 @@ function setView(v) {
   renderLista();
 }
 
-// ─── MODAL DETALHES ──────────────────────────────────────────────────────────
+// ─── MODAL DETALHES ────────────────────────────────────────────────────────────
 
 function verDetalhes(id) {
   const i = state.ideias.find(x => x.id === id);
   if (!i) return;
-
-  // Incrementa visualizações
-  i.visualizacoes++;
-  saveState(state);
 
   const sc = statusCfg[i.status] || statusCfg['Pendente'];
   const ic = impactoCfg[i.impacto] || impactoCfg['Médio'];
@@ -266,7 +221,6 @@ function verDetalhes(id) {
 
   document.getElementById('detDesc').textContent = i.desc;
 
-  // Feedback do gestor
   const fw = document.getElementById('detFeedbackWrap');
   fw.innerHTML = i.feedback ? `
     <div class="gestor-feedback">
@@ -274,7 +228,6 @@ function verDetalhes(id) {
       <div class="gestor-feedback-text">${i.feedback}</div>
     </div>` : '';
 
-  // Tracker
   const passos = sc.passos;
   const tracker = trackerLabels.map((lbl, idx) => {
     const cls = (i.status === 'Rejeitada' && idx === 2) ? '' :
@@ -287,7 +240,6 @@ function verDetalhes(id) {
   }).join('');
   document.getElementById('detTracker').innerHTML = `<div class="status-tracker" style="display:flex">${tracker}</div>`;
 
-  // Meta
   document.getElementById('detMeta').innerHTML = `
     <div class="modal-meta-item"><div class="modal-meta-key">Data de Submissão</div><div class="modal-meta-val">📅 ${i.data}</div></div>
     <div class="modal-meta-item"><div class="modal-meta-key">Comentários</div><div class="modal-meta-val">💬 ${i.comentarios}</div></div>
@@ -298,10 +250,9 @@ function verDetalhes(id) {
   `;
 
   document.getElementById('modalDetalhes').classList.add('open');
-  renderLista();
 }
 
-// ─── MODAL NOVA / EDITAR ─────────────────────────────────────────────────────
+// ─── MODAL NOVA / EDITAR ───────────────────────────────────────────────────────
 
 function abrirModalNova() {
   editandoId = null;
@@ -309,7 +260,7 @@ function abrirModalNova() {
   document.getElementById('btnFormSubmit').textContent = 'Submeter Ideia';
   document.getElementById('fTitulo').value    = '';
   document.getElementById('fCategoria').value = '';
-  document.getElementById('fDesc').value      = '';  
+  document.getElementById('fDesc').value      = '';
   document.getElementById('fPrazo').value     = 'Curto prazo (1-3 meses)';
   document.getElementById('fRecursos').value  = 'Apenas equipe interna';
   document.getElementById('charTitulo').textContent = '0';
@@ -333,7 +284,9 @@ function editarIdeia(id) {
   document.getElementById('modalForm').classList.add('open');
 }
 
-function salvarIdeia() {
+// ─── SALVAR IDEIA (CRIAR OU EDITAR) — AGORA USA A API ─────────────────────────
+
+async function salvarIdeia() {
   const titulo    = document.getElementById('fTitulo').value.trim();
   const categoria = document.getElementById('fCategoria').value;
   const desc      = document.getElementById('fDesc').value.trim();
@@ -344,58 +297,89 @@ function salvarIdeia() {
   if (!categoria) { toast('⚠ Selecione uma categoria');   return; }
   if (!desc)      { toast('⚠ Adicione uma descrição');    return; }
 
-  const hoje = new Date();
-  const data = `${String(hoje.getDate()).padStart(2,'0')}/${String(hoje.getMonth()+1).padStart(2,'0')}/${hoje.getFullYear()}`;
+  const btn = document.getElementById('btnFormSubmit');
+  btn.disabled = true;
+  btn.textContent = '⏳ Salvando...';
 
-  if (editandoId) {
-    const idx = state.ideias.findIndex(x => x.id === editandoId);
-    if (idx !== -1) {
-      state.ideias[idx] = { ...state.ideias[idx], titulo, categoria, desc, prazo, recursos };
+  try {
+    if (editandoId) {
+      // PUT /api/ideias/:id
+      await Ideias.editar(editandoId, { titulo, categoria, desc, prazo, recursos });
+
+      // Atualiza localmente (sem recarregar tudo)
+      const idx = state.ideias.findIndex(x => x.id === editandoId);
+      if (idx !== -1) {
+        state.ideias[idx] = { ...state.ideias[idx], titulo, categoria, desc, prazo, recursos };
+      }
       toast('✅ Ideia atualizada com sucesso!');
-    }
-  } else {
-    state.ideias.unshift({
-      id: Date.now(), titulo, categoria, status: 'Pendente',
-      comentarios: 0, visualizacoes: 0,
-      desc, prazo, recursos, data, pts: null, feedback: null
-    });
-    state.usuario.pontos += 50;
-    toast('💡 Ideia submetida! +50 pontos adicionados');
-  }
 
-  saveState(state);
-  fecharModal('modalForm');
-  render();
+    } else {
+      // POST /api/ideias
+      const resultado = await Ideias.criar({ titulo, categoria, desc, prazo, recursos });
+      // resultado = { ideia: {...}, pontos: 500 }
+
+      state.ideias.unshift(resultado.ideia);
+      state.usuario.pontos = resultado.pontos;
+
+      // Atualiza pontos no localStorage para refletir no topbar
+      const usu = getUsuario();
+      if (usu) {
+        usu.pontos = resultado.pontos;
+        setUsuario(usu);
+      }
+
+      toast('💡 Ideia submetida! +50 pontos adicionados');
+    }
+
+    fecharModal('modalForm');
+    render();
+
+  } catch (err) {
+    toast('❌ ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = editandoId ? 'Salvar Alterações' : 'Submeter Ideia';
+  }
 }
 
-// ─── EXCLUIR ─────────────────────────────────────────────────────────────────
+// ─── EXCLUIR ──────────────────────────────────────────────────────────────────
 
 function confirmarExcluirModal(id) {
   excluindoId = id;
   const i = state.ideias.find(x => x.id === id);
-  document.getElementById('excluirDesc').textContent = `A ideia "${i?.titulo || ''}" será removida permanentemente. Esta ação não pode ser desfeita.`;
+  document.getElementById('excluirDesc').textContent =
+    `A ideia "${i?.titulo || ''}" será removida permanentemente. Esta ação não pode ser desfeita.`;
   document.getElementById('modalExcluir').classList.add('open');
 }
 
-function confirmarExclusao() {
+async function confirmarExclusao() {
   if (!excluindoId) return;
-  state.ideias = state.ideias.filter(x => x.id !== excluindoId);
-  saveState(state);
-  fecharModal('modalExcluir');
-  excluindoId = null;
-  render();
-  toast('🗑️ Ideia excluída.');
+
+  const btn = document.getElementById('btnConfirmarExcluir'); // adicione este id no HTML se não existir
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Excluindo...'; }
+
+  try {
+    await Ideias.excluir(excluindoId);
+    state.ideias = state.ideias.filter(x => x.id !== excluindoId);
+    fecharModal('modalExcluir');
+    excluindoId = null;
+    render();
+    toast('🗑️ Ideia excluída.');
+  } catch (err) {
+    toast('❌ ' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Confirmar Exclusão'; }
+  }
 }
 
-// ─── UTILS ───────────────────────────────────────────────────────────────────
+// ─── UTILS ────────────────────────────────────────────────────────────────────
 
 function fecharModal(id) {
   document.getElementById(id).classList.remove('open');
 }
 
 function updateChar(inputId, countId, max) {
-  const len = document.getElementById(inputId).value.length;
-  document.getElementById(countId).textContent = len;
+  document.getElementById(countId).textContent = document.getElementById(inputId).value.length;
 }
 
 function toast(msg) {
@@ -407,7 +391,6 @@ function toast(msg) {
   setTimeout(() => el.remove(), 4000);
 }
 
-// fechar modais ao clicar fora
 document.querySelectorAll('.modal-overlay').forEach(o => {
   o.addEventListener('click', e => {
     if (e.target === o) {
@@ -418,5 +401,5 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
   });
 });
 
-// ─── START ───────────────────────────────────────────────────────────────────
-render();
+// ─── START ────────────────────────────────────────────────────────────────────
+init();

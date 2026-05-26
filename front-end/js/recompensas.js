@@ -1,54 +1,55 @@
-// ─── DADOS MOCKADOS ──────────────────────────────────────────────────────────
+// ─── recompensas.js — VERSÃO INTEGRADA COM API ───────────────────────────────
+// Requer: <script src="js/api.js"></script> ANTES deste arquivo no HTML
 
-const STORAGE_KEY = 'ni_recompensas';
+let state = {
+  pontos: 0,
+  historico: [],
+  recompensas: []
+};
 
-function getState() {
-  let s;
-  try { 
-      s = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState(); 
-  } catch { 
-      s = defaultState(); 
-  }
-
-  const pontosGlobais = localStorage.getItem('nation_user_points');
-  if (pontosGlobais !== null) {
-      s.pontos = parseInt(pontosGlobais); 
-  } else {
-      localStorage.setItem('nation_user_points', s.pontos);
-  }
-
-  return s;
-}
-
-function saveState(s) { 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); 
-    
-    localStorage.setItem('nation_user_points', s.pontos);
-}
-
-function defaultState() {
-  return {
-    pontos: 450, // Pontos iniciais mockados
-    historico: [
-      { id: 99, nome: 'Vale-Presente iFood', icon: '🍔', pts: 80,  data: '10/05/2026' },
-      { id: 98, nome: 'Day Off Extra',       icon: '🌴', pts: 200, data: '02/04/2026' },
-    ],
-    recompensas: [
-      { id: 1, nome: 'Vale-Presente Amazon',   icon: '🎁', pts: 100, desc: 'Voucher de R$ 100 para compras na Amazon',      disponiveis: 25, desbloqueado: true  },
-      { id: 2, nome: 'Day Off Extra',          icon: '🌴', pts: 200, desc: 'Um dia de folga remunerada adicional',          disponiveis: 10, desbloqueado: true  },
-      { id: 3, nome: 'Curso Online Udemy',     icon: '📚', pts: 150, desc: 'Acesso a qualquer curso da plataforma Udemy',   disponiveis: 15, desbloqueado: true  },
-      { id: 4, nome: 'Vale-Presente iFood',    icon: '🍔', pts: 80,  desc: 'Voucher de R$ 80 para pedidos no iFood',        disponiveis: 30, desbloqueado: true  },
-      { id: 5, nome: 'Equipamento Home Office',icon: '📦', pts: 500, desc: 'Cadeira ergonômica ou monitor adicional',        disponiveis: 5,  desbloqueado: false },
-      { id: 6, nome: 'Troféu Inovador do Mês', icon: '🏆', pts: 800, desc: 'Reconhecimento especial e troféu físico',       disponiveis: 2,  desbloqueado: false },
-    ]
-  };
-}
-
-let state = getState();
-let filtroAtual = 'disponiveis';
+let filtroAtual  = 'disponiveis';
 let resgateAtual = null;
 
-// ─── RENDER ──────────────────────────────────────────────────────────────────
+// ─── INICIALIZAÇÃO ────────────────────────────────────────────────────────────
+
+async function init() {
+  checkAuth();
+  await Promise.all([carregarCatalogo(), carregarHistorico()]);
+}
+
+async function carregarCatalogo() {
+  try {
+    mostrarLoading(true);
+    const resultado = await Recompensas.catalogo();
+    // resultado = { pontos: 450, recompensas: [...] }
+    state.pontos       = resultado.pontos;
+    state.recompensas  = resultado.recompensas;
+    render();
+  } catch (err) {
+    toast('❌ Erro ao carregar catálogo: ' + err.message);
+    console.error(err);
+  } finally {
+    mostrarLoading(false);
+  }
+}
+
+async function carregarHistorico() {
+  try {
+    state.historico = await Recompensas.historico();
+    // Se o filtro já estiver em histórico, re-renderiza
+    if (filtroAtual === 'historico') renderGrid();
+  } catch (err) {
+    console.error('Erro ao carregar histórico:', err.message);
+    state.historico = [];
+  }
+}
+
+function mostrarLoading(show) {
+  const el = document.getElementById('loadingOverlay');
+  if (el) el.style.display = show ? 'flex' : 'none';
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
 
 function render() {
   atualizarPontos();
@@ -58,16 +59,19 @@ function render() {
 }
 
 function atualizarPontos() {
-  document.getElementById('pontosHero').textContent    = state.pontos;
-  document.getElementById('pontosTopbar').textContent  = state.pontos;
+  document.getElementById('pontosHero').textContent   = state.pontos;
+  document.getElementById('pontosTopbar').textContent = state.pontos;
   const disponiveis = state.recompensas.filter(r => r.pts <= state.pontos && r.disponiveis > 0).length;
   document.getElementById('heroSub').textContent =
     `Você pode resgatar ${disponiveis} recompensa${disponiveis !== 1 ? 's' : ''}`;
 }
 
 function atualizarMeta() {
-  const meta = state.recompensas.find(r => r.pts > state.pontos) || state.recompensas[state.recompensas.length - 1];
-  const pct  = Math.min(100, Math.round(state.pontos / meta.pts * 100));
+  const meta = state.recompensas.find(r => r.pts > state.pontos)
+    || state.recompensas[state.recompensas.length - 1];
+  if (!meta) return;
+
+  const pct    = Math.min(100, Math.round(state.pontos / meta.pts * 100));
   const faltam = Math.max(0, meta.pts - state.pontos);
 
   document.getElementById('metaFaltam').textContent =
@@ -147,16 +151,18 @@ function renderGrid() {
   }).join('');
 }
 
-// ─── FILTRO ──────────────────────────────────────────────────────────────────
+// ─── FILTRO ───────────────────────────────────────────────────────────────────
 
 function filtrar(tipo, btn) {
   filtroAtual = tipo;
   document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderGrid();
+  // Carrega histórico fresh se necessário
+  if (tipo === 'historico') carregarHistorico().then(() => renderGrid());
+  else renderGrid();
 }
 
-// ─── MODAL ───────────────────────────────────────────────────────────────────
+// ─── MODAL ────────────────────────────────────────────────────────────────────
 
 function abrirModal(id) {
   const r = state.recompensas.find(r => r.id === id);
@@ -173,26 +179,44 @@ function fecharModal() {
   resgateAtual = null;
 }
 
-function confirmarResgate() {
+// ─── CONFIRMAR RESGATE — AGORA USA A API ──────────────────────────────────────
+
+async function confirmarResgate() {
   if (!resgateAtual) return;
   const r = resgateAtual;
 
-  // Debitar pontos
-  state.pontos -= r.pts;
-  r.disponiveis = Math.max(0, r.disponiveis - 1);
+  const btn = document.getElementById('btnConfirmarResgate'); // adicione este id no HTML se não existir
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Processando...'; }
 
-  // Registrar histórico
-  const hoje = new Date();
-  const data = `${String(hoje.getDate()).padStart(2,'0')}/${String(hoje.getMonth()+1).padStart(2,'0')}/${hoje.getFullYear()}`;
-  state.historico.unshift({ id: Date.now(), nome: r.nome, icon: r.icon, pts: r.pts, data });
+  try {
+    const resultado = await Recompensas.resgatar(r.id);
+    // resultado = { mensagem, pontos: novoSaldo, resgate: { id, nome, icon, pts, data } }
 
-  saveState(state);
-  fecharModal();
+    // Atualiza state com dados reais do servidor
+    state.pontos = resultado.pontos;
+    state.historico.unshift(resultado.resgate);
 
-  // Mostrar sucesso
-  document.getElementById('modalSucessoDesc').textContent =
-    `"${r.nome}" foi resgatado com sucesso! Você usou ${r.pts} pontos e agora tem ${state.pontos} pontos.`;
-  document.getElementById('modalSucesso').classList.add('open');
+    // Decrementa estoque localmente (evita recarregar tudo)
+    const rec = state.recompensas.find(x => x.id === r.id);
+    if (rec) {
+      rec.disponiveis = Math.max(0, rec.disponiveis - 1);
+      rec.desbloqueado = rec.custo_pontos <= state.pontos && rec.disponiveis > 0;
+    }
+
+    fecharModal();
+
+    document.getElementById('modalSucessoDesc').textContent =
+      `"${r.nome}" foi resgatado com sucesso! Você usou ${r.pts} pontos e agora tem ${state.pontos} pontos.`;
+    document.getElementById('modalSucesso').classList.add('open');
+
+    render();
+
+  } catch (err) {
+    toast('❌ ' + err.message);
+    fecharModal();
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Confirmar Resgate'; }
+  }
 }
 
 function fecharSucesso() {
@@ -201,7 +225,7 @@ function fecharSucesso() {
   resgateAtual = null;
 }
 
-// ─── TOAST ───────────────────────────────────────────────────────────────────
+// ─── TOAST ────────────────────────────────────────────────────────────────────
 
 function toast(msg) {
   const wrap = document.getElementById('toastWrap');
@@ -212,8 +236,6 @@ function toast(msg) {
   setTimeout(() => el.remove(), 4000);
 }
 
-// ─── FECHAR MODAL AO CLICAR FORA ─────────────────────────────────────────────
-
 document.querySelectorAll('.modal-overlay').forEach(o => {
   o.addEventListener('click', e => {
     if (e.target === o) {
@@ -223,5 +245,5 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
   });
 });
 
-// ─── START ───────────────────────────────────────────────────────────────────
-render();
+// ─── START ────────────────────────────────────────────────────────────────────
+init();
