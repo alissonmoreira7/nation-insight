@@ -10,33 +10,28 @@ const recompCtrl   = require('./controllers/recompensaController');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// ── MIDDLEWARES ──────────────────────────────────────────────────────────────
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// ── AUTH ─────────────────────────────────────────────────────────────────────
 app.post('/api/auth/registrar', authCtrl.registrar);
 app.post('/api/auth/login',     authCtrl.login);
 
 // ── IDEIAS (requer token) ─────────────────────────────────────────────────────
-app.get   ('/api/ideias/minhas', auth, ideiaCtrl.minhasIdeias);  // GET  → carrega lista
-app.post  ('/api/ideias',        auth, ideiaCtrl.criarIdeia);    // POST → salvarIdeia()
-app.put   ('/api/ideias/:id',    auth, ideiaCtrl.editarIdeia);   // PUT  → salvarIdeia() edição
-app.delete("/api/ideias/:id",    auth, ideiaCtrl.excluirIdeia);  // DEL  → confirmarExclusao()
-app.patch ("/api/ideias/:id/status", auth, ideiaCtrl.atualizarStatus); // PATCH → gestor avança fase + credita pontos
+app.get   ('/api/ideias/minhas', auth, ideiaCtrl.minhasIdeias);
+app.post  ('/api/ideias',        auth, ideiaCtrl.criarIdeia);
+app.put   ('/api/ideias/:id',    auth, ideiaCtrl.editarIdeia);
+app.delete("/api/ideias/:id",    auth, ideiaCtrl.excluirIdeia);
+app.patch ("/api/ideias/:id/status", auth, ideiaCtrl.atualizarStatus); 
 
 // ── RECOMPENSAS (requer token) ────────────────────────────────────────────────
-app.get ('/api/recompensas',               auth, recompCtrl.listarRecompensas); // GET  → render()
-app.get ('/api/recompensas/historico',     auth, recompCtrl.historico);         // GET  → state.historico
-app.post('/api/recompensas/:id/resgatar',  auth, recompCtrl.resgatar);          // POST → confirmarResgate()
+app.get ('/api/recompensas',               auth, recompCtrl.listarRecompensas); 
+app.get ('/api/recompensas/historico',     auth, recompCtrl.historico);        
+app.post('/api/recompensas/:id/resgatar',  auth, recompCtrl.resgatar);        
 
-// ── HEALTH CHECK ──────────────────────────────────────────────────────────────
 app.get('/', (_, res) => res.json({ status: 'NationInsight API online' }));
 
-// ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((req, res) => res.status(404).json({ erro: `Rota ${req.path} não encontrada` }));
 
-// ── START ─────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`\n NationInsight API → http://localhost:${PORT}`);
   console.log(' Rotas:');
