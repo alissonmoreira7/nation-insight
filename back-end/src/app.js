@@ -22,7 +22,8 @@ app.post('/api/auth/login',     authCtrl.login);
 app.get   ('/api/ideias/minhas', auth, ideiaCtrl.minhasIdeias);  // GET  → carrega lista
 app.post  ('/api/ideias',        auth, ideiaCtrl.criarIdeia);    // POST → salvarIdeia()
 app.put   ('/api/ideias/:id',    auth, ideiaCtrl.editarIdeia);   // PUT  → salvarIdeia() edição
-app.delete('/api/ideias/:id',    auth, ideiaCtrl.excluirIdeia);  // DEL  → confirmarExclusao()
+app.delete("/api/ideias/:id",    auth, ideiaCtrl.excluirIdeia);  // DEL  → confirmarExclusao()
+app.patch ("/api/ideias/:id/status", auth, ideiaCtrl.atualizarStatus); // PATCH → gestor avança fase + credita pontos
 
 // ── RECOMPENSAS (requer token) ────────────────────────────────────────────────
 app.get ('/api/recompensas',               auth, recompCtrl.listarRecompensas); // GET  → render()
@@ -30,7 +31,7 @@ app.get ('/api/recompensas/historico',     auth, recompCtrl.historico);         
 app.post('/api/recompensas/:id/resgatar',  auth, recompCtrl.resgatar);          // POST → confirmarResgate()
 
 // ── HEALTH CHECK ──────────────────────────────────────────────────────────────
-app.get('/', (_, res) => res.json({ status: '🚀 NationInsight API online' }));
+app.get('/', (_, res) => res.json({ status: 'NationInsight API online' }));
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((req, res) => res.status(404).json({ erro: `Rota ${req.path} não encontrada` }));
