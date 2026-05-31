@@ -1,4 +1,3 @@
-<script>
     let modoAtual = 'login'; // 'login' | 'cadastro'
 
     // Permite Enter para submeter
@@ -119,4 +118,3 @@
     if (localStorage.getItem('ni_token')) {
     window.location.href = 'ideias.html';
 }
-</script>
