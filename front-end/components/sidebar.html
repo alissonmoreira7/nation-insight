@@ -27,20 +27,36 @@
 
     <div class="sidebar-footer">
         <div class="user-chip">
-        <div class="chip-avatar">AC</div>
-        <div>
-            <div class="chip-name">Ana Costa</div>
-            <div class="chip-role">Análise de Dados</div>
+            <div class="chip-avatar" id="sidebarAvatarIniciais">--</div>
+            <div>
+                <div class="chip-name" id="sidebarNome">Carregando...</div>
+                <div class="chip-role" id="sidebarCargo">--</div>
+            </div>
+
+            <!-- Ícone de sair — chama logout() definido em api.js -->
+            <span class="chip-logout" title="Sair da conta" onclick="logout()">↪</span>
         </div>
 
-        <span class="chip-logout">↪</span>
-    </div>
-
-    <div class="dica-dia">
-        <strong>💡 Dica do Dia</strong>
-        Ideias com alto impacto e detalhamento completo têm 3x mais chance de aprovação!
+        <div class="dica-dia">
+            <strong>💡 Dica do Dia</strong>
+            Ideias com alto impacto e detalhamento completo têm 3x mais chance de aprovação!
         </div>
     </div>
 </aside>
 
-<!-- <script src="js/sidebar.js"></script> -->
+<script>
+    (function initSidebar() {
+        try {
+            const usu = JSON.parse(localStorage.getItem('ni_usuario') || 'null');
+            if (usu) {
+                const elNome     = document.getElementById('sidebarNome');
+                const elCargo    = document.getElementById('sidebarCargo');
+                const elIniciais = document.getElementById('sidebarAvatarIniciais');
+
+                if (elNome)     elNome.textContent     = usu.nome    || 'Usuário';
+                if (elCargo)    elCargo.textContent     = usu.cargo   || 'Colaborador';
+                if (elIniciais) elIniciais.textContent  = usu.iniciais || '?';
+            }
+        } catch(e) { console.error('Sidebar init error:', e); }
+    })();
+</script>

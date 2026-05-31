@@ -3,26 +3,55 @@
     <div class="brand">
         <span class="brand-name">NationInsight</span>
         <span class="brand-sub">Nation Capital</span>
-        </div>
-        <input class="search-bar" type="text" placeholder="Buscar insights, colaboradores...">
-        <div class="topbar-right">
+    </div>
+    <input class="search-bar" type="text" placeholder="Buscar insights, colaboradores...">
+    <div class="topbar-right">
         <div class="pontos-badge">
             <div>
-            <span>Meus Pontos</span>
-            <strong id="pontosTopbar">450</strong>
+                <span>Meus Pontos</span>
+                <strong id="pontosTopbar">0</strong>
             </div>
         </div>
 
         <button class="notif-btn">🔔<span class="notif-dot">2</span></button>
 
         <div class="user-info">
-            <div class="user-avatar">AC</div>
+            <div class="user-avatar" id="topbarAvatarIniciais">--</div>
             <div>
-            <div class="user-name-top">Ana Costa</div>
-            <div class="user-role-top">Análise de Dados</div>
+                <div class="user-name-top" id="topbarNome">Carregando...</div>
+                <div class="user-role-top" id="topbarCargo">--</div>
             </div>
         </div>
     </div>
-
-    <script src="js/recompensas.js"></script>
 </header>
+
+<script>
+(function initTopbar() {
+    // Lê o usuário do localStorage (salvo pelo api.js no login)
+    try {
+        const usu = JSON.parse(localStorage.getItem('ni_usuario') || 'null');
+        if (usu) {
+            const elPontos   = document.getElementById('pontosTopbar');
+            const elNome     = document.getElementById('topbarNome');
+            const elCargo    = document.getElementById('topbarCargo');
+            const elIniciais = document.getElementById('topbarAvatarIniciais');
+
+            if (elPontos)   elPontos.textContent   = usu.pontos  ?? 0;
+            if (elNome)     elNome.textContent      = usu.nome    || 'Usuário';
+            if (elCargo)    elCargo.textContent     = usu.cargo   || 'Colaborador';
+            if (elIniciais) elIniciais.textContent  = usu.iniciais || '?';
+        }
+    } catch(e) { console.error('Topbar init error:', e); }
+
+    // Expõe função para que recompensas.js e ideias.js atualizem os pontos ao vivo
+    window.atualizarPontosTopbar = function(novosSaldo) {
+        const el = document.getElementById('pontosTopbar');
+        if (el) el.textContent = novosSaldo;
+        // Mantém o localStorage sincronizado
+        try {
+            const usu = JSON.parse(localStorage.getItem('ni_usuario') || 'null');
+            if (usu) { usu.pontos = novosSaldo; localStorage.setItem('ni_usuario', JSON.stringify(usu)); }
+        } catch(e) {}
+    };
+})();
+</script>
