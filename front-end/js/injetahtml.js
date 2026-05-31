@@ -1,22 +1,29 @@
 function carregarComponente(url, containerId, activeLinkId = null) {
     fetch(url)
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
             return response.text();
         })
-        .then(data => {
-            // Injeta o HTML no container escolhido
-            document.getElementById(containerId).innerHTML = data;
+        .then(html => {
+            const container = document.getElementById(containerId);
+            container.innerHTML = html;
 
-            // Se foi passado um ID de link ativo, procura ele e adiciona a classe
+            container.querySelectorAll('script').forEach(oldScript => {
+                const newScript = document.createElement('script');
+                newScript.textContent = oldScript.textContent;
+                document.body.appendChild(newScript);
+            });
+
+            // Marca link ativo se informado
             if (activeLinkId) {
                 const linkAtivo = document.getElementById(activeLinkId);
-                if (linkAtivo) {
-                    linkAtivo.classList.add('active');
-                }
+                if (linkAtivo) linkAtivo.classList.add('active');
+            }
+
+            if (containerId === 'sidebar-container' && typeof initSidebar === 'function') {
+                initSidebar();
             }
         })
-        .catch(error => console.error(`Erro ao carregar o componente ${url}:`, error));
+        .catch(error => console.error(`Erro ao carregar o componente ${url}:`, error)
+    );
 }

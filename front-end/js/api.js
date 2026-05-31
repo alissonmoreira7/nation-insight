@@ -49,27 +49,18 @@ const Auth = {
 // ── IDEIAS ────────────────────────────────────────────────────────────────────
 const Ideias = {
 
-  // Substitui o defaultState().ideias
-  // Use no lugar de: let state = getState()
   async minhas() {
     return api('GET', '/ideias/minhas');
-    // Retorna: [{ id, titulo, desc, categoria, status, impacto, prazo,
-    //             recursos, visualizacoes, comentarios, pts, feedback, data }]
   },
 
-  // Substitui: state.ideias.unshift({ id: Date.now(), ... })
-  // front envia: { titulo, categoria, desc, prazo, recursos }
-  // retorna: { ideia: {...}, pontos: 500 }
   async criar(dados) {
     return api('POST', '/ideias', dados);
   },
 
-  // Substitui: state.ideias[idx] = { ...state.ideias[idx], ...dados }
   async editar(id, dados) {
     return api('PUT', `/ideias/${id}`, dados);
   },
 
-  // Substitui: state.ideias = state.ideias.filter(x => x.id !== excluindoId)
   async excluir(id) {
     return api('DELETE', `/ideias/${id}`);
   },
@@ -78,20 +69,14 @@ const Ideias = {
 // ── RECOMPENSAS ───────────────────────────────────────────────────────────────
 const Recompensas = {
 
-  // Substitui o defaultState() inteiro do recompensas.js
-  // retorna: { pontos: 450, recompensas: [{id, nome, icon, pts, desc, disponiveis, desbloqueado}] }
   async catalogo() {
     return api('GET', '/recompensas');
   },
 
-  // Substitui: state.historico do defaultState()
-  // retorna: [{ id, nome, icon, pts, data }]
   async historico() {
     return api('GET', '/recompensas/historico');
   },
 
-  // Substitui: confirmarResgate() do recompensas.js
-  // retorna: { mensagem, pontos: novoSaldo, resgate: { id, nome, icon, pts, data } }
   async resgatar(id) {
     return api('POST', `/recompensas/${id}/resgatar`);
   },
