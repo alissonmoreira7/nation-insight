@@ -1,6 +1,3 @@
-// src/controllers/authController.js — VERSÃO CORRIGIDA
-// Nomenclatura unificada: usa APENAS tab_usuario / tab_cat_ideia / tab_ideia / tab_recompensa
-
 const bcrypt = require('bcryptjs');
 const jwt    = require('jsonwebtoken');
 const pool   = require('../database/connection');
@@ -48,7 +45,8 @@ async function login(req, res) {
         senha_usu  AS senha,
         perfilacesso_usu  AS tipo,
         saldoPontos_usu   AS pontos,
-        urlfoto_usu       AS foto
+        urlfoto_usu       AS foto,
+        cargo_usu         AS cargo
       FROM tab_usuario
       WHERE Email_usu = ?`,
       [email]
@@ -75,9 +73,9 @@ async function login(req, res) {
         email:    user.email,
         tipo:     user.tipo,
         iniciais: user.nome.split(' ').map(p => p[0]).join('').substring(0,2).toUpperCase(),
-        cargo:    'Colaborador',     // campo não existe em tab_usuario, valor fixo por ora
+        cargo:    user.cargo || 'Colaborador',
         pontos:   user.pontos || 0,
-        ranking:  1,                 // pode calcular dinamicamente depois
+        ranking:  1,
       }
     });
   } catch (err) {

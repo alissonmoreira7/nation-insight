@@ -1,25 +1,22 @@
-// src/controllers/ideiaController.js — VERSÃO CORRIGIDA
-// Nomenclatura unificada: tab_ideia, tab_cat_ideia, tab_usuario
-
 const pool = require('../database/connection');
 
 function mapIdeia(row) {
   return {
-    id:           row.id,
-    titulo:       row.titulo,
-    desc:         row.descricao,
-    categoria:    row.categoria_nome || '',
-    status:       row.status,
-    impacto:      row.impacto || null,
-    prazo:        row.prazo   || '',
-    recursos:     row.recursos || '',
+    id:            row.id,
+    titulo:        row.titulo,
+    desc:          row.descricao,
+    categoria:     row.categoria_nome || '',
+    status:        row.status,
+    impacto:       row.impacto  || null,
+    prazo:         row.prazo    || '',
+    recursos:      row.recursos || '',
     visualizacoes: row.visualizacoes || 0,
     comentarios:   row.comentarios   || 0,
-    pts:          row.pts,
-    feedback:     row.feedback || null,
-    data:         row.created_at
-                    ? new Date(row.created_at).toLocaleDateString('pt-BR')
-                    : '',
+    pts:           row.pts           || null,
+    feedback:      row.feedback      || null,
+    data:          row.created_at
+                     ? new Date(row.created_at).toLocaleDateString('pt-BR')
+                     : '',
   };
 }
 
@@ -28,16 +25,23 @@ async function minhasIdeias(req, res) {
   try {
     const [rows] = await pool.query(
       `SELECT
-        i.IdCod_ide       AS id,
-        i.Titulo_ide      AS titulo,
-        i.Descricao_ide   AS descricao,
-        i.Status_ide      AS status,
-        i.DataCadastro_ide AS created_at,
-        c.Nome_cat        AS categoria_nome
-      FROM tab_ideia i
-      LEFT JOIN tab_cat_ideia c ON i.IdCod_cat = c.IdCod_cat
-      WHERE i.IdCod_usu = ?
-      ORDER BY i.DataCadastro_ide DESC`,
+         i.IdCod_ide          AS id,
+         i.Titulo_ide         AS titulo,
+         i.Descricao_ide      AS descricao,
+         i.Status_ide         AS status,
+         i.Prazo_ide          AS prazo,
+         i.Recursos_ide       AS recursos,
+         i.Impacto_ide        AS impacto,
+         i.Visualizacoes_ide  AS visualizacoes,
+         i.Comentarios_ide    AS comentarios,
+         i.Pontos_ide         AS pts,
+         i.Feedback_ide       AS feedback,
+         i.DataCadastro_ide   AS created_at,
+         c.Nome_cat           AS categoria_nome
+       FROM tab_ideia i
+       LEFT JOIN tab_cat_ideia c ON i.IdCod_cat = c.IdCod_cat
+       WHERE i.IdCod_usu = ?
+       ORDER BY i.DataCadastro_ide DESC`,
       [req.usuario.id]
     );
     return res.json(rows.map(mapIdeia));
@@ -63,7 +67,7 @@ async function criarIdeia(req, res) {
 
     const [result] = await pool.query(
       `INSERT INTO tab_ideia
-        (Titulo_ide, Descricao_ide, Status_ide, Prazo_ide, Recursos_ide, DataCadastro_ide, IdCod_usu, IdCod_cat)
+         (Titulo_ide, Descricao_ide, Status_ide, Prazo_ide, Recursos_ide, DataCadastro_ide, IdCod_usu, IdCod_cat)
        VALUES (?, ?, 'Pendente', ?, ?, CURDATE(), ?, ?)`,
       [titulo, desc, prazo || null, recursos || null, req.usuario.id, categoriaId]
     );
@@ -80,10 +84,22 @@ async function criarIdeia(req, res) {
     );
     const novosPontos = pontosRow[0]?.pontos || 0;
 
-    // Busca a ideia recém-criada
+    // Busca ideia recém-criada com todos os campos
     const [nova] = await pool.query(
-      `SELECT i.IdCod_ide AS id, i.Titulo_ide AS titulo, i.Descricao_ide AS descricao,
-              i.Status_ide AS status, i.DataCadastro_ide AS created_at, c.Nome_cat AS categoria_nome
+      `SELECT
+         i.IdCod_ide         AS id,
+         i.Titulo_ide        AS titulo,
+         i.Descricao_ide     AS descricao,
+         i.Status_ide        AS status,
+         i.Prazo_ide         AS prazo,
+         i.Recursos_ide      AS recursos,
+         i.Impacto_ide       AS impacto,
+         i.Visualizacoes_ide AS visualizacoes,
+         i.Comentarios_ide   AS comentarios,
+         i.Pontos_ide        AS pts,
+         i.Feedback_ide      AS feedback,
+         i.DataCadastro_ide  AS created_at,
+         c.Nome_cat          AS categoria_nome
        FROM tab_ideia i
        LEFT JOIN tab_cat_ideia c ON i.IdCod_cat = c.IdCod_cat
        WHERE i.IdCod_ide = ?`,
@@ -127,10 +143,10 @@ async function editarIdeia(req, res) {
        SET Titulo_ide=?, Descricao_ide=?, Prazo_ide=?, Recursos_ide=?, IdCod_cat=?
        WHERE IdCod_ide=? AND IdCod_usu=?`,
       [
-        titulo   || rows[0].Titulo_ide,
-        desc     || rows[0].Descricao_ide,
-        prazo    || rows[0].Prazo_ide,
-        recursos || rows[0].Recursos_ide,
+        titulo    || rows[0].Titulo_ide,
+        desc      || rows[0].Descricao_ide,
+        prazo     || rows[0].Prazo_ide,
+        recursos  || rows[0].Recursos_ide,
         categoriaId,
         req.params.id,
         req.usuario.id,
