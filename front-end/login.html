@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — NationInsight</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+ 
+/* ── VARIÁVEIS ── */
+:root {
+  --azul:    #0A2540;
+  --azul-hover: #0d2d4a;
+  --dourado: #D4AF37;
+  --bg:      #F4F1EC;
+  --branco:  #FFFFFF;
+  --verde:   #10b981;
+  --vermelho:#ef4444;
+  --cinza-cl:#B4B4B4;
+}
+ 
+/* ── RESET ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+ 
+/* ── BODY ── */
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+ 
+/* ── CARD PRINCIPAL ── */
+.login-wrap {
+  display: flex;
+  width: 860px;
+  max-width: 100%;
+  min-height: 520px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--branco);
+  border: 1px solid rgba(0, 0, 0, .06);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .04), 0 16px 48px rgba(0, 0, 0, .08);
+}
+ 
+/* ── LADO ESQUERDO ── */
+.login-brand {
+  width: 300px;
+  min-width: 260px;
+  background: var(--azul);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px 36px;
+  position: relative;
+  overflow: hidden;
+}
+ 
+.login-brand::before {
+  content: '';
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, .10);
+  bottom: -80px;
+  left: -80px;
+  pointer-events: none;
+}
+ 
+.login-brand::after {
+  content: '';
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, .06);
+  top: -40px;
+  right: -40px;
+  pointer-events: none;
+}
+ 
+.brand-logo-area {
+  position: relative;
+  z-index: 1;
+}
+ 
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  background: var(--dourado);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+  font-size: 22px;
+}
+ 
+.brand-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 28px;
+  color: var(--branco);
+  line-height: 1.2;
+  letter-spacing: -.3px;
+  margin-bottom: 10px;
+}
+ 
+.brand-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, .45);
+  line-height: 1.65;
+  font-weight: 300;
+}
+ 
+.brand-badges {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+ 
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, .5);
+  font-weight: 300;
+}
+ 
+.brand-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dourado);
+  opacity: .7;
+  flex-shrink: 0;
+}
+ 
+/* ── LADO DIREITO ── */
+.login-form-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 48px;
+}
+ 
+.form-eyebrow {
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--dourado);
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+ 
+.form-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 28px;
+  color: var(--azul);
+  line-height: 1.2;
+  letter-spacing: -.3px;
+  margin-bottom: 6px;
+}
+ 
+.form-sub {
+  font-size: 13.5px;
+  color: #9a9a8e;
+  margin-bottom: 36px;
+  font-weight: 300;
+}
+ 
+/* ── CAMPOS ── */
+.form-group {
+  margin-bottom: 16px;
+}
+ 
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--azul);
+  letter-spacing: .03em;
+  margin-bottom: 6px;
+}
+ 
+.form-group input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid #E8E5DE;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  color: var(--azul);
+  background: #FAFAF8;
+  outline: none;
+  transition: border-color .2s, background .2s;
+}
+ 
+.form-group input:focus {
+  border-color: var(--azul);
+  background: var(--branco);
+}
+ 
+.form-group input.erro {
+  border-color: var(--vermelho);
+}
+ 
+/* ── MENSAGENS DE ERRO ── */
+.erro-msg {
+  display: none;
+  font-size: 12px;
+  color: var(--vermelho);
+  margin-top: 5px;
+}
+ 
+.erro-msg.visivel {
+  display: block;
+}
+ 
+/* ── ALERTA GLOBAL ── */
+.alerta {
+  display: none;
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+ 
+.alerta.erro {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  display: block;
+}
+ 
+.alerta.sucesso {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  display: block;
+}
+ 
+/* ── OPÇÕES (lembrar / esqueci) ── */
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  margin-top: 4px;
+}
+ 
+.form-remember {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: #888;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 300;
+}
+ 
+.form-checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #D0CEC7;
+  border-radius: 4px;
+  background: var(--branco);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, border-color .15s;
+  cursor: pointer;
+}
+ 
+.form-checkbox.active {
+  background: var(--azul);
+  border-color: var(--azul);
+}
+ 
+.form-forgot {
+  font-size: 12.5px;
+  color: #888;
+  text-decoration: none;
+  font-weight: 300;
+}
+ 
+.form-forgot:hover {
+  color: var(--azul);
+}
+ 
+/* ── BOTÃO PRINCIPAL ── */
+.btn-login {
+  width: 100%;
+  padding: 13px;
+  background: var(--azul);
+  color: var(--branco);
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  letter-spacing: .02em;
+  transition: background .18s, transform .1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+ 
+.btn-login:hover:not(:disabled) {
+  background: var(--azul-hover);
+}
+ 
+.btn-login:active:not(:disabled) {
+  transform: scale(.99);
+}
+ 
+.btn-login:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+ 
+/* ── DIVISOR ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0;
+}
+ 
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #EEECE7;
+}
+ 
+.divider span {
+  font-size: 11.5px;
+  color: #bbb;
+  font-weight: 300;
+}
+ 
+/* ── RODAPÉ DO FORMULÁRIO ── */
+.form-footer {
+  text-align: center;
+  font-size: 13px;
+  color: #9a9a8e;
+  font-weight: 300;
+}
+ 
+.form-footer a {
+  color: var(--azul);
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid #c5d2df;
+  padding-bottom: 1px;
+  transition: border-color .15s;
+}
+ 
+.form-footer a:hover {
+  border-color: var(--azul);
+}
+ 
+/* ── CAMPO CARGO (modo cadastro) ── */
+#campoCargo {
+  display: none;
+}
+ 
+/* ── RESPONSIVO ── */
+@media (max-width: 640px) {
+  .login-brand {
+    display: none;
+  }
+ 
+  .login-form-wrap {
+    padding: 36px 28px;
+  }
+}
+  </style>
+</head>
+<body>
+
+<div class="login-wrap">
+
+  <!-- Lado esquerdo — branding -->
+  <div class="login-brand">
+    <div class="brand-logo">💡</div>
+    <div class="brand-title">NationInsight</div>
+    <div class="brand-sub">Plataforma de gestão de ideias e inovação da NationCapital</div>
+    <div class="brand-badges">
+      <div class="brand-badge"><span>💡</span> Submeta suas ideias</div>
+      <div class="brand-badge"><span>🏆</span> Ganhe pontos e recompensas</div>
+      <div class="brand-badge"><span>📊</span> Acompanhe o progresso</div>
+    </div>
+  </div>
+
+  <!-- Lado direito — formulário -->
+  <div class="login-form-wrap">
+    <div class="form-title" id="formTitulo">Bem-vindo de volta</div>
+    <div class="form-sub" id="formSub">Entre com sua conta para continuar</div>
+
+    <div class="alerta" id="alerta"></div>
+
+    <div class="form-group">
+      <label>E-mail</label>
+      <input type="email" id="fEmail" placeholder="seu@email.com" autocomplete="email">
+      <div class="erro-msg" id="errEmail">Informe um e-mail válido</div>
+    </div>
+
+    <div class="form-group">
+      <label>Senha</label>
+      <input type="password" id="fSenha" placeholder="••••••••" autocomplete="current-password">
+      <div class="erro-msg" id="errSenha">Informe sua senha</div>
+    </div>
+
+    <div class="form-group" id="campoNome" style="display:none">
+      <label>Nome completo</label>
+      <input type="text" id="fNome" placeholder="Ana Costa">
+      <div class="erro-msg" id="errNome">Informe seu nome</div>
+    </div>
+
+    <button class="btn-login" id="btnSubmit" onclick="submeter()">Entrar</button>
+
+    <div class="divider">ou</div>
+
+    <div class="form-footer">
+      <span id="footerTexto">Não tem conta?</span>
+      <a href="#" id="btnAlternar" onclick="alternarModo(event)">Criar conta</a>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  let modoAtual = 'login'; // 'login' | 'cadastro'
+
+  // Permite Enter para submeter
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') submeter();
+  });
+
+  function alternarModo(e) {
+    e.preventDefault();
+    modoAtual = modoAtual === 'login' ? 'cadastro' : 'login';
+    limparAlertas();
+
+    const ehCadastro = modoAtual === 'cadastro';
+    document.getElementById('formTitulo').textContent  = ehCadastro ? 'Criar conta' : 'Bem-vindo de volta';
+    document.getElementById('formSub').textContent     = ehCadastro ? 'Preencha os dados para se registrar' : 'Entre com sua conta para continuar';
+    document.getElementById('btnSubmit').textContent   = ehCadastro ? 'Criar conta' : 'Entrar';
+    document.getElementById('campoNome').style.display = ehCadastro ? 'block' : 'none';
+    document.getElementById('footerTexto').textContent = ehCadastro ? 'Já tem conta?' : 'Não tem conta?';
+    document.getElementById('btnAlternar').textContent = ehCadastro ? 'Entrar' : 'Criar conta';
+  }
+
+  async function submeter() {
+    limparAlertas();
+
+    const email = document.getElementById('fEmail').value.trim();
+    const senha = document.getElementById('fSenha').value.trim();
+    const nome  = document.getElementById('fNome').value.trim();
+
+    // Validação básica
+    let valido = true;
+    if (!email || !email.includes('@')) {
+      document.getElementById('fEmail').classList.add('erro');
+      document.getElementById('errEmail').classList.add('visivel');
+      valido = false;
+    }
+    if (!senha) {
+      document.getElementById('fSenha').classList.add('erro');
+      document.getElementById('errSenha').classList.add('visivel');
+      valido = false;
+    }
+    if (modoAtual === 'cadastro' && !nome) {
+      document.getElementById('fNome').classList.add('erro');
+      document.getElementById('errNome').classList.add('visivel');
+      valido = false;
+    }
+    if (!valido) return;
+
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.textContent = '⏳ Aguarde...';
+
+    try {
+      if (modoAtual === 'cadastro') {
+        // Cria conta
+        const res = await fetch('http://localhost:3000/api/auth/registrar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, email, senha })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          mostrarAlerta('erro', data.erro || 'Erro ao criar conta');
+          return;
+        }
+
+        mostrarAlerta('sucesso', '✅ Conta criada! Fazendo login...');
+        setTimeout(() => alternarModo({ preventDefault: () => {} }), 800);
+
+      } else {
+        // Login
+        const res = await fetch('http://localhost:3000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, senha })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          mostrarAlerta('erro', data.erro || 'E-mail ou senha incorretos');
+          return;
+        }
+
+        // Salva sessão e redireciona
+        localStorage.setItem('ni_token', data.token);
+        localStorage.setItem('ni_usuario', JSON.stringify(data.usuario));
+        mostrarAlerta('sucesso', '✅ Login realizado! Redirecionando...');
+        setTimeout(() => { window.location.href = 'ideias.html'; }, 600);
+      }
+
+    } catch (err) {
+      mostrarAlerta('erro', '❌ Não foi possível conectar ao servidor. Verifique se o back-end está rodando.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = modoAtual === 'cadastro' ? 'Criar conta' : 'Entrar';
+    }
+  }
+
+  function mostrarAlerta(tipo, msg) {
+    const el = document.getElementById('alerta');
+    el.className = 'alerta ' + tipo;
+    el.textContent = msg;
+  }
+
+  function limparAlertas() {
+    document.getElementById('alerta').className = 'alerta';
+    ['fEmail','fSenha','fNome'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('erro');
+    });
+    ['errEmail','errSenha','errNome'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('visivel');
+    });
+  }
+
+  // Se já tiver token válido, vai direto para ideias
+  if (localStorage.getItem('ni_token')) {
+    window.location.href = 'ideias.html';
+  }
+</script>
+
+</body>
+</html>
