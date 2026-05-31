@@ -37,8 +37,8 @@ app.use((req, res) => res.status(404).json({ erro: `Rota ${req.path} não encont
 
 // ── START ─────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`\n🚀 NationInsight API → http://localhost:${PORT}`);
-  console.log('📋 Rotas:');
+  console.log(`\n NationInsight API → http://localhost:${PORT}`);
+  console.log(' Rotas:');
   console.log('   POST /api/auth/registrar');
   console.log('   POST /api/auth/login');
   console.log('   GET  /api/ideias/minhas');
