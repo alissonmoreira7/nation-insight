@@ -20,6 +20,14 @@ function mapIdeia(row) {
   };
 }
 
+// ── Pontos concedidos por fase (nova regra de negócio) ────────────────────────
+// Colaborador NÃO ganha pontos ao criar a ideia.
+// Pontos são creditados apenas quando o GESTOR avança o status da ideia.
+const PONTOS_POR_STATUS = {
+  'Em Análise': 25,   // gestor aceitou para análise
+  'Aprovada':   75,   // ideia aprovada
+};
+
 // GET /api/ideias/minhas
 async function minhasIdeias(req, res) {
   try {
@@ -72,17 +80,15 @@ async function criarIdeia(req, res) {
       [titulo, desc, prazo || null, recursos || null, req.usuario.id, categoriaId]
     );
 
-    // Credita +50 pontos
-    await pool.query(
-      'UPDATE tab_usuario SET saldoPontos_usu = saldoPontos_usu + 50 WHERE IdCod_usu = ?',
-      [req.usuario.id]
-    );
+    // REGRA DE NEGÓCIO: pontos NÃO são creditados na criação.
+    // Serão creditados pelo gestor ao avançar o status (ver atualizarStatus).
 
+    // Busca saldo atual sem alteração
     const [pontosRow] = await pool.query(
       'SELECT saldoPontos_usu AS pontos FROM tab_usuario WHERE IdCod_usu = ?',
       [req.usuario.id]
     );
-    const novosPontos = pontosRow[0]?.pontos || 0;
+    const pontosAtuais = pontosRow[0]?.pontos || 0;
 
     // Busca ideia recém-criada com todos os campos
     const [nova] = await pool.query(
@@ -108,7 +114,7 @@ async function criarIdeia(req, res) {
 
     return res.status(201).json({
       ideia:  mapIdeia(nova[0]),
-      pontos: novosPontos,
+      pontos: pontosAtuais,
     });
   } catch (err) {
     console.error(err);
@@ -116,7 +122,7 @@ async function criarIdeia(req, res) {
   }
 }
 
-// PUT /api/ideias/:id
+// PUT /api/ideias/:id  (edição pelo colaborador — sem alteração de pontos)
 async function editarIdeia(req, res) {
   const { titulo, categoria, desc, prazo, recursos } = req.body;
 
@@ -160,6 +166,72 @@ async function editarIdeia(req, res) {
   }
 }
 
+// PATCH /api/ideias/:id/status  (exclusivo para gestor/admin)
+// Avança o status da ideia e credita pontos ao colaborador conforme a fase.
+async function atualizarStatus(req, res) {
+  const { status, feedback, impacto, pontos: pontosCustom } = req.body;
+
+  const statusPermitidos = ['Em Análise', 'Aprovada', 'Rejeitada'];
+  if (!status || !statusPermitidos.includes(status))
+    return res.status(400).json({ erro: `Status inválido. Permitidos: ${statusPermitidos.join(', ')}` });
+
+  // Somente gestores e admins podem alterar status
+  if (!['gestor', 'admin'].includes(req.usuario.tipo))
+    return res.status(403).json({ erro: 'Apenas gestores podem atualizar o status de uma ideia' });
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT i.*, u.IdCod_usu AS dono_id
+       FROM tab_ideia i
+       JOIN tab_usuario u ON i.IdCod_usu = u.IdCod_usu
+       WHERE i.IdCod_ide = ?`,
+      [req.params.id]
+    );
+
+    if (!rows.length)
+      return res.status(404).json({ erro: 'Ideia não encontrada' });
+
+    const ideia = rows[0];
+
+    // Calcula pontos a creditar nesta transição
+    const pontosGanhos = pontosCustom ?? PONTOS_POR_STATUS[status] ?? 0;
+
+    // Atualiza status, feedback e impacto da ideia
+    await pool.query(
+      `UPDATE tab_ideia
+       SET Status_ide   = ?,
+           Feedback_ide = COALESCE(?, Feedback_ide),
+           Impacto_ide  = COALESCE(?, Impacto_ide),
+           Pontos_ide   = Pontos_ide + ?
+       WHERE IdCod_ide = ?`,
+      [status, feedback || null, impacto || null, pontosGanhos, req.params.id]
+    );
+
+    // Credita pontos ao colaborador dono da ideia (somente se houver pontos para esta fase)
+    if (pontosGanhos > 0) {
+      await pool.query(
+        'UPDATE tab_usuario SET saldoPontos_usu = saldoPontos_usu + ? WHERE IdCod_usu = ?',
+        [pontosGanhos, ideia.dono_id]
+      );
+    }
+
+    // Busca saldo atualizado do colaborador para retornar
+    const [pontosRow] = await pool.query(
+      'SELECT saldoPontos_usu AS pontos FROM tab_usuario WHERE IdCod_usu = ?',
+      [ideia.dono_id]
+    );
+
+    return res.json({
+      mensagem:     `Status atualizado para "${status}" com sucesso`,
+      pontosGanhos,
+      novoSaldoColaborador: pontosRow[0]?.pontos || 0,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ erro: 'Erro ao atualizar status' });
+  }
+}
+
 // DELETE /api/ideias/:id
 async function excluirIdeia(req, res) {
   try {
@@ -186,4 +258,4 @@ async function excluirIdeia(req, res) {
   }
 }
 
-module.exports = { minhasIdeias, criarIdeia, editarIdeia, excluirIdeia };
+module.exports = { minhasIdeias, criarIdeia, editarIdeia, atualizarStatus, excluirIdeia };

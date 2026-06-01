@@ -1,7 +1,3 @@
-// src/database/migrate.js — VERSÃO CORRIGIDA
-// Nomenclatura baseada no modelo relacional (modelorelacional_nationinsight.png)
-// Roda com: npm run migrate
-
 const pool = require('./connection');
 
 async function migrate() {

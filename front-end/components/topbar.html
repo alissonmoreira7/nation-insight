@@ -13,7 +13,26 @@
             </div>
         </div>
 
-        <button class="notif-btn">🔔<span class="notif-dot">2</span></button>
+        <!-- Botão de notificações -->
+        <div class="notif-wrapper" id="notifWrapper">
+            <button class="notif-btn" id="notifBtn" onclick="toggleNotifModal(event)" aria-label="Notificações">
+                🔔
+            </button>
+
+            <!-- Modal de notificações (dropdown inline) -->
+            <div class="notif-modal" id="notifModal" style="display:none;" role="dialog" aria-label="Painel de notificações">
+                <div class="notif-modal-header">
+                    <span class="notif-modal-title">Notificações</span>
+                    <button class="notif-mark-all" onclick="marcarTodasLidas()" title="Marcar todas como lidas">✓ Marcar todas</button>
+                </div>
+                <div class="notif-list" id="notifList">
+                    <!-- preenchido pelo JS abaixo -->
+                </div>
+                <div class="notif-modal-footer">
+                    <span class="notif-footer-txt">Ver todas as notificações →</span>
+                </div>
+            </div>
+        </div>
 
         <div class="user-info">
             <div class="user-avatar" id="topbarAvatarIniciais">--</div>
@@ -27,7 +46,7 @@
 
 <script>
 (function initTopbar() {
-    // Lê o usuário do localStorage (salvo pelo api.js no login)
+    // ── Dados do usuário ──────────────────────────────────────────────────────
     try {
         const usu = JSON.parse(localStorage.getItem('ni_usuario') || 'null');
         if (usu) {
@@ -36,22 +55,132 @@
             const elCargo    = document.getElementById('topbarCargo');
             const elIniciais = document.getElementById('topbarAvatarIniciais');
 
-            if (elPontos)   elPontos.textContent   = usu.pontos  ?? 0;
-            if (elNome)     elNome.textContent      = usu.nome    || 'Usuário';
-            if (elCargo)    elCargo.textContent     = usu.cargo   || 'Colaborador';
-            if (elIniciais) elIniciais.textContent  = usu.iniciais || '?';
+            if (elPontos)   elPontos.textContent   = usu.pontos    ?? 0;
+            if (elNome)     elNome.textContent      = usu.nome      || 'Usuário';
+            if (elCargo)    elCargo.textContent     = usu.cargo     || 'Colaborador';
+            if (elIniciais) elIniciais.textContent  = usu.iniciais  || '?';
         }
     } catch(e) { console.error('Topbar init error:', e); }
 
-    // Expõe função para que recompensas.js e ideias.js atualizem os pontos ao vivo
-    window.atualizarPontosTopbar = function(novosSaldo) {
+    // ── Atualiza pontos ao vivo (chamado por ideias.js e recompensas.js) ──────
+    window.atualizarPontosTopbar = function(novoSaldo) {
         const el = document.getElementById('pontosTopbar');
-        if (el) el.textContent = novosSaldo;
-        // Mantém o localStorage sincronizado
+        if (el) el.textContent = novoSaldo;
         try {
             const usu = JSON.parse(localStorage.getItem('ni_usuario') || 'null');
-            if (usu) { usu.pontos = novosSaldo; localStorage.setItem('ni_usuario', JSON.stringify(usu)); }
+            if (usu) { usu.pontos = novoSaldo; localStorage.setItem('ni_usuario', JSON.stringify(usu)); }
         } catch(e) {}
     };
+
+    // ── Notificações fictícias ────────────────────────────────────────────────
+    const NOTIFICACOES = [
+        {
+            id: 1,
+            icon: '✅',
+            titulo: 'Ideia Aprovada!',
+            desc: 'Sua ideia "Automação de Relatórios com IA" foi aprovada pela equipe gestora.',
+            tempo: 'há 10 minutos',
+            lida: false,
+        },
+        {
+            id: 2,
+            icon: '⭐',
+            titulo: 'Você ganhou 50 pontos',
+            desc: 'Parabéns! Sua nova ideia foi registrada e você recebeu 50 pontos de bônus.',
+            tempo: 'há 1 hora',
+            lida: false,
+        },
+        {
+            id: 3,
+            icon: '🔍',
+            titulo: 'Ideia em Análise',
+            desc: 'Sua ideia "Novo Fluxo de Onboarding" entrou em análise pelo gestor de RH.',
+            tempo: 'há 3 horas',
+            lida: false,
+        },
+        {
+            id: 4,
+            icon: '🏆',
+            titulo: 'Ranking atualizado',
+            desc: 'Você subiu para o Top 5 de inovadores do mês. Continue assim!',
+            tempo: 'ontem',
+            lida: true,
+        },
+        {
+            id: 5,
+            icon: '🎁',
+            titulo: 'Nova recompensa disponível',
+            desc: 'O benefício "Troféu Inovador do Mês" foi adicionado ao catálogo de recompensas.',
+            tempo: '2 dias atrás',
+            lida: true,
+        },
+    ];
+
+    // Renderiza a lista de notificações
+    function renderNotifList() {
+        const list = document.getElementById('notifList');
+        if (!list) return;
+
+        const naoLidas = NOTIFICACOES.filter(n => !n.lida);
+
+        if (NOTIFICACOES.length === 0) {
+            list.innerHTML = '<div class="notif-vazia">🔕 Nenhuma notificação por enquanto.</div>';
+            return;
+        }
+
+        list.innerHTML = NOTIFICACOES.map(n => `
+            <div class="notif-item ${n.lida ? 'lida' : ''}" onclick="marcarLida(${n.id})">
+                <div class="notif-item-icon">${n.icon}</div>
+                <div class="notif-item-body">
+                    <div class="notif-item-titulo">${n.titulo}</div>
+                    <div class="notif-item-desc">${n.desc}</div>
+                    <div class="notif-item-tempo">${n.tempo}</div>
+                </div>
+                <div class="notif-unread-dot"></div>
+            </div>
+        `).join('');
+
+        // Atualiza badge
+        const dot = document.getElementById('notifDot');
+        if (dot) {
+            const count = naoLidas.length;
+            dot.textContent = count;
+            dot.style.display = count > 0 ? 'flex' : 'none';
+        }
+    }
+
+    // Abre/fecha o modal
+    window.toggleNotifModal = function(e) {
+        e.stopPropagation();
+        const modal = document.getElementById('notifModal');
+        if (!modal) return;
+        const aberto = modal.style.display !== 'none';
+        modal.style.display = aberto ? 'none' : 'block';
+        if (!aberto) renderNotifList();
+    };
+
+    // Marca uma notificação como lida
+    window.marcarLida = function(id) {
+        const notif = NOTIFICACOES.find(n => n.id === id);
+        if (notif) { notif.lida = true; renderNotifList(); }
+    };
+
+    // Marca todas como lidas
+    window.marcarTodasLidas = function() {
+        NOTIFICACOES.forEach(n => n.lida = true);
+        renderNotifList();
+    };
+
+    // Fecha o modal ao clicar fora dele
+    document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('notifWrapper');
+        const modal   = document.getElementById('notifModal');
+        if (modal && wrapper && !wrapper.contains(e.target)) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // Renderização inicial do badge
+    renderNotifList();
 })();
 </script>
