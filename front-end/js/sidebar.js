@@ -10,14 +10,6 @@ function initSidebar() {
         'progresso.html':  'nav-progresso',
     };
 
-    // Remove active de todos, aplica no correto
-    document.querySelectorAll('.sidebar .nav-item').forEach(item => item.classList.remove('active'));
-    const activeId = navMap[currentPage];
-    if (activeId) {
-        const el = document.getElementById(activeId);
-        if (el) el.classList.add('active');
-    }
-
     // Ripple nos itens de navegação
     document.querySelectorAll('.sidebar .nav-item').forEach(item => {
         item.addEventListener('mousedown', function() { this.style.backgroundColor = 'rgba(0,0,0,0.15)'; });
