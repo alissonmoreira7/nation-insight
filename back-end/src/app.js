@@ -6,6 +6,7 @@ const auth         = require('./middleware/auth');
 const authCtrl     = require('./controllers/authController');
 const ideiaCtrl    = require('./controllers/ideiaController');
 const recompCtrl   = require('./controllers/recompensaController');
+const dashCtrl     = require('./controllers/dashboardController');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +16,8 @@ app.use(express.json());
 
 app.post('/api/auth/registrar', authCtrl.registrar);
 app.post('/api/auth/login',     authCtrl.login);
+app.get ('/api/auth/perfil',    auth, authCtrl.obterPerfil);
+app.put ('/api/auth/perfil',    auth, authCtrl.atualizarPerfil);
 
 // ── IDEIAS (requer token) ─────────────────────────────────────────────────────
 app.get   ('/api/ideias/minhas', auth, ideiaCtrl.minhasIdeias);
@@ -27,6 +30,9 @@ app.patch ("/api/ideias/:id/status", auth, ideiaCtrl.atualizarStatus);
 app.get ('/api/recompensas',               auth, recompCtrl.listarRecompensas); 
 app.get ('/api/recompensas/historico',     auth, recompCtrl.historico);        
 app.post('/api/recompensas/:id/resgatar',  auth, recompCtrl.resgatar);        
+
+// ── DASHBOARD (requer token) ─────────────────────────────────────────────
+app.get('/api/dashboard', auth, dashCtrl.getDashboard);
 
 app.get('/', (_, res) => res.json({ status: 'NationInsight API online' }));
 
@@ -43,5 +49,6 @@ app.listen(PORT, () => {
   console.log('   DEL  /api/ideias/:id');
   console.log('   GET  /api/recompensas');
   console.log('   GET  /api/recompensas/historico');
-  console.log('   POST /api/recompensas/:id/resgatar\n');
+  console.log('   POST /api/recompensas/:id/resgatar');
+  console.log('   GET  /api/dashboard\n');
 });

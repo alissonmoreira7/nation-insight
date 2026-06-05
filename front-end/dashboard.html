@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard — NationInsight</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+        <link rel="stylesheet" href="css/dashboard.css">
+        <link rel="stylesheet" href="css/topbar.css">
+        <link rel="stylesheet" href="css/sidebar.css">
+        <link rel="stylesheet" href="css/coresgerais.css">
+    </head>
+    <body>
+    <div id="topbar-container"></div>
+
+    <div class="layout">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+
+        <div class="page-header">
+            <h1>Dashboard de Inovação</h1>
+            <p>Visão geral das métricas e tendências do portal NationInsight</p>
+            <div class="page-header-meta">
+            <span class="badge-data" id="dataAtual">—</span>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpi-grid" id="kpiGrid">
+            <div class="kpi-card skeleton" style="height:88px"></div>
+            <div class="kpi-card skeleton" style="height:88px"></div>
+            <div class="kpi-card skeleton" style="height:88px"></div>
+            <div class="kpi-card skeleton" style="height:88px"></div>
+            <div class="kpi-card skeleton" style="height:88px"></div>
+        </div>
+
+        <!-- GRÁFICOS -->
+        <div class="charts-row">
+
+            <div class="chart-card">
+            <div class="chart-title">Evolução de Ideias por Mês</div>
+            <div class="chart-sub">Ideias enviadas vs. aprovadas nos últimos 7 meses</div>
+            <div class="area-chart-wrap" id="areaChartWrap">
+                <div class="skeleton" style="height:200px;border-radius:8px"></div>
+            </div>
+            <div class="chart-legend" style="margin-top:12px">
+                <div class="legend-item"><div class="legend-dot" style="background:#3B82F6"></div> Enviadas</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#D4AF37"></div> Aprovadas</div>
+            </div>
+            </div>
+
+            <div class="chart-card">
+            <div class="chart-title">Por Categoria</div>
+            <div class="chart-sub">Distribuição das ideias submetidas</div>
+            <div class="donut-wrap">
+                <div class="donut-svg-wrap" id="donutSvg">
+                <div class="skeleton" style="width:160px;height:160px;border-radius:50%"></div>
+                </div>
+                <div class="donut-legend" id="donutLegend"></div>
+            </div>
+            </div>
+
+        </div>
+
+        <!-- BOTTOM ROW -->
+        <div class="bottom-row">
+
+            <div class="ideias-recentes-card">
+            <div class="card-header">
+                <div class="card-header-left">
+                <span class="card-header-icon">🏆</span>
+                <span class="card-header-title">Ideias Recentes</span>
+                </div>
+                <a class="card-header-link" href="ideias.html">Ver todas →</a>
+            </div>
+            <div id="ideiasRecentesList">
+                <div class="skeleton" style="height:56px;border-radius:8px;margin-bottom:8px"></div>
+                <div class="skeleton" style="height:56px;border-radius:8px;margin-bottom:8px"></div>
+                <div class="skeleton" style="height:56px;border-radius:8px;margin-bottom:8px"></div>
+                <div class="skeleton" style="height:56px;border-radius:8px"></div>
+            </div>
+            </div>
+
+            <div class="right-panel">
+
+            <div class="taxa-card">
+                <div class="taxa-header">
+                <span class="taxa-icon">📈</span>
+                <span class="taxa-title">Métricas de Desempenho</span>
+                </div>
+                <div id="taxaList">
+                <div class="skeleton" style="height:36px;border-radius:6px;margin-bottom:12px"></div>
+                <div class="skeleton" style="height:36px;border-radius:6px;margin-bottom:12px"></div>
+                <div class="skeleton" style="height:36px;border-radius:6px"></div>
+                </div>
+            </div>
+
+            <div class="top-colab-card">
+                <div class="card-header" style="margin-bottom:12px">
+                <div class="card-header-left">
+                    <span class="card-header-icon">👑</span>
+                    <span class="card-header-title">Top Colaboradores</span>
+                </div>
+                </div>
+                <div id="topColabList">
+                <div class="skeleton" style="height:44px;border-radius:6px;margin-bottom:8px"></div>
+                <div class="skeleton" style="height:44px;border-radius:6px;margin-bottom:8px"></div>
+                <div class="skeleton" style="height:44px;border-radius:6px"></div>
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+        </main>
+    </div>
+
+    <div class="toast-wrap" id="toastWrap"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/injetahtml.js"></script>
+
+    <script>
+        carregarComponente('components/sidebar.html', 'sidebar-container', 'nav-dashboard');
+        carregarComponente('components/topbar.html',  'topbar-container');
+
+        document.getElementById('dataAtual').textContent =
+        new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    </script>
+
+    </body>
+</html>
