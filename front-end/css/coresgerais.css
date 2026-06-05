@@ -1,0 +1,19 @@
+:root {
+    --azul:      #0A2540;
+    --azul-card: #0d2d4a;
+    --dourado:   #D4AF37;
+    --dourado2:  #F5C542;
+    --branco:    #FFFFFF;
+    --cinza-cl:  #B4B4B4;
+    --cinza-esc: #545454;
+    --bg:        #f0f2f5;
+    --verde:     #10b981;
+    --laranja:   #f59e0b;
+    --vermelho:  #ef4444;
+    --azul-info: #3b82f6;
+    --roxo:      #8b5cf6;
+    --sidebar-w: 190px;
+    --card-shadow: 0 2px 12px rgba(10,37,64,0.08);
+    --card-border: 1px solid rgba(10,37,64,0.08);
+    --card-radius: 12px;
+}

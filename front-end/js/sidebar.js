@@ -7,7 +7,7 @@ function initSidebar() {
         'ideias.html':     'nav-ideias',
         'explorar.html':   'nav-explorar',
         'recompensas.html':'nav-recompensas',
-        'progresso.html':  'nav-progresso',
+        'configuracoes.html': 'nav-configuracoes',
     };
 
     // Ripple nos itens de navegação

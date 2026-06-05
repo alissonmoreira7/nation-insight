@@ -28,9 +28,6 @@
                 <div class="notif-list" id="notifList">
                     <!-- preenchido pelo JS abaixo -->
                 </div>
-                <div class="notif-modal-footer">
-                    <span class="notif-footer-txt">Ver todas as notificações →</span>
-                </div>
             </div>
         </div>
 
@@ -46,7 +43,6 @@
 
 <script>
 (function initTopbar() {
-    // ── Dados do usuário ──────────────────────────────────────────────────────
     try {
         const usu = JSON.parse(localStorage.getItem('ni_usuario') || 'null');
         if (usu) {
@@ -62,7 +58,6 @@
         }
     } catch(e) { console.error('Topbar init error:', e); }
 
-    // ── Atualiza pontos ao vivo (chamado por ideias.js e recompensas.js) ──────
     window.atualizarPontosTopbar = function(novoSaldo) {
         const el = document.getElementById('pontosTopbar');
         if (el) el.textContent = novoSaldo;
@@ -72,7 +67,6 @@
         } catch(e) {}
     };
 
-    // ── Notificações fictícias ────────────────────────────────────────────────
     const NOTIFICACOES = [
         {
             id: 1,
@@ -116,7 +110,6 @@
         },
     ];
 
-    // Renderiza a lista de notificações
     function renderNotifList() {
         const list = document.getElementById('notifList');
         if (!list) return;
@@ -140,7 +133,6 @@
             </div>
         `).join('');
 
-        // Atualiza badge
         const dot = document.getElementById('notifDot');
         if (dot) {
             const count = naoLidas.length;
@@ -149,7 +141,6 @@
         }
     }
 
-    // Abre/fecha o modal
     window.toggleNotifModal = function(e) {
         e.stopPropagation();
         const modal = document.getElementById('notifModal');
@@ -159,19 +150,16 @@
         if (!aberto) renderNotifList();
     };
 
-    // Marca uma notificação como lida
     window.marcarLida = function(id) {
         const notif = NOTIFICACOES.find(n => n.id === id);
         if (notif) { notif.lida = true; renderNotifList(); }
     };
 
-    // Marca todas como lidas
     window.marcarTodasLidas = function() {
         NOTIFICACOES.forEach(n => n.lida = true);
         renderNotifList();
     };
 
-    // Fecha o modal ao clicar fora dele
     document.addEventListener('click', function(e) {
         const wrapper = document.getElementById('notifWrapper');
         const modal   = document.getElementById('notifModal');
@@ -180,7 +168,6 @@
         }
     });
 
-    // Renderização inicial do badge
     renderNotifList();
 })();
 </script>

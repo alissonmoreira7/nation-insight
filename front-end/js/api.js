@@ -44,6 +44,21 @@ const Auth = {
     setUsuario(data.usuario);
     return data.usuario;
   },
+
+  async obterPerfil() {
+    return api('GET', '/auth/perfil');
+  },
+
+  async atualizarPerfil(dados) {
+    const data = await api('PUT', '/auth/perfil', dados);
+    if (data.usuario) {
+      // Mescla com dados locais existentes para preservar propriedades como pontos/ranking que podem não vir no retorno
+      const usuarioLocal = getUsuario() || {};
+      const usuarioAtualizado = { ...usuarioLocal, ...data.usuario };
+      setUsuario(usuarioAtualizado);
+    }
+    return data;
+  },
 };
 
 // ── IDEIAS ────────────────────────────────────────────────────────────────────
@@ -79,5 +94,13 @@ const Recompensas = {
 
   async resgatar(id) {
     return api('POST', `/recompensas/${id}/resgatar`);
+  },
+};
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+const DashboardAPI = {
+
+  async dados() {
+    return api('GET', '/dashboard');
   },
 };

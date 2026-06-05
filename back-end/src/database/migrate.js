@@ -16,6 +16,10 @@ async function migrate() {
         perfilacesso_usu  ENUM('colaborador','gestor','admin') NOT NULL DEFAULT 'colaborador',
         saldoPontos_usu   INT           DEFAULT 0,
         urlfoto_usu       VARCHAR(255)  DEFAULT NULL,
+        cargo_usu         VARCHAR(100)  DEFAULT 'Colaborador',
+        notif_email_usu   TINYINT       DEFAULT 1,
+        notif_push_usu    TINYINT       DEFAULT 1,
+        notif_novidades_usu TINYINT     DEFAULT 1,
         created_at        DATETIME      DEFAULT CURRENT_TIMESTAMP
       )
     `);

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Configurações — NationInsight</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+        <link rel="stylesheet" href="css/configuracoes.css">
+        <link rel="stylesheet" href="css/topbar.css">
+        <link rel="stylesheet" href="css/sidebar.css">
+        <link rel="stylesheet" href="css/coresgerais.css">
+    </head>
+    <body>
+    <div id="topbar-container"></div>
+
+    <div class="layout">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Configurações do Usuário</h1>
+                <p>Gerencie seus dados de perfil e preferências de notificação</p>
+            </div>
+
+            <div class="config-container">
+                <!-- CARD PERFIL -->
+                <div class="config-card">
+                    <div class="card-title">
+                        <i class="fa-solid fa-user-gear"></i> Perfil do Usuário
+                    </div>
+
+                    <div class="profile-avatar-wrap">
+                        <div class="profile-avatar" id="perfAvatarIniciais">--</div>
+                        <div class="profile-name" id="perfNomeLabel">Carregando...</div>
+                        <div class="profile-role" id="perfCargoLabel">--</div>
+                    </div>
+
+                    <form id="formPerfil" onsubmit="salvarPerfil(event)">
+                        <div class="form-group">
+                            <label for="nome">Nome Completo</label>
+                            <input type="text" id="nome" required placeholder="Seu nome">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">E-mail Corporativo</label>
+                            <input type="email" id="email" required placeholder="seuemail@empresa.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="cargo">Cargo / Função</label>
+                            <input type="text" id="cargo" placeholder="Ex: Desenvolvedor, Analista">
+                        </div>
+                        <div class="form-group">
+                            <label for="senha">Nova Senha (deixe em branco para não alterar)</label>
+                            <input type="password" id="senha" minlength="6" placeholder="Mínimo de 6 caracteres">
+                        </div>
+                        <button type="submit" class="btn-save">
+                            <i class="fa-solid fa-check"></i> Salvar Perfil
+                        </button>
+                    </form>
+                </div>
+
+                <!-- CARD NOTIFICAÇÕES -->
+                <div class="config-card">
+                    <div class="card-title">
+                        <i class="fa-solid fa-bell"></i> Permissões de Notificação
+                    </div>
+
+                    <div class="toggle-list">
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <div class="toggle-label">Notificações por E-mail</div>
+                                <div class="toggle-desc">Receba atualizações importantes sobre o status das suas ideias diretamente no seu e-mail.</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="notifEmail" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <div class="toggle-label">Notificações Push</div>
+                                <div class="toggle-desc">Receba alertas em tempo real no seu navegador quando receber novos comentários ou pontos.</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="notifPush" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <div class="toggle-label">Novidades & Campanhas</div>
+                                <div class="toggle-desc">Fique sabendo de novas campanhas de inovação abertas e resgates recomendados.</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="notifNovidades" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button onclick="salvarNotificacoes()" class="btn-save" style="margin-top: 24px;">
+                        <i class="fa-solid fa-bell-slash"></i> Atualizar Notificações
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast-wrap" id="toastWrap"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/injetahtml.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/configuracoes.js"></script>
+
+    <script>
+        checkAuth();
+        carregarComponente('components/sidebar.html', 'sidebar-container', 'nav-configuracoes');
+        carregarComponente('components/topbar.html',  'topbar-container');
+    </script>
+    </body>
+</html>

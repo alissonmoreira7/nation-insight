@@ -1,41 +1,56 @@
-/* ==========================================================================
-   SIDEBAR
-   ========================================================================== */
 
 .sidebar {
-    width: var(--sidebar-w);
-    background: var(--azul);
-    display: flex;
-    flex-direction: column;
+    width: var(--sidebar-w); background: var(--azul);
+    display: flex; flex-direction: column;
     padding: 16px 0;
-    position: fixed;
-    top: 56px; 
-    bottom: 0; 
-    left: 0;
-    overflow-y: auto;
+    position: fixed; top: 56px; bottom: 0; left: 0; overflow-y: auto;
 }
 
-.sidebar .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 12px 24px;
-    color: #B4B4B4; 
-    text-decoration: none; 
-    font-size: 1rem;
-    border-left: 4px solid transparent;
-    transition: all 0.2s ease;
+.nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 20px; color: var(--cinza-cl);
+    font-size: 13.5px; font-weight: 500; cursor: pointer;
+    transition: all .15s; text-decoration: none;
+    border-left: 3px solid transparent;
 }
 
-.sidebar .nav-icon {
-    width: 24px;
-    font-size: 1.2rem;
-    text-align: center;
+/* .nav-item:hover { 
+    background: rgba(255,255,255,.07); 
+    color: var(--branco); 
+} */
+/* 
+.nav-item.active { 
+    background: rgba(212,175,55,.12); 
+    color: var(--dourado); 
+    border-left-color: var(--dourado); 
+} */
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,.08); 
 }
 
-.sidebar .nav-item.active {
-    background-color: rgba(255, 255, 255, 0.08); 
-    color: #F5C542;
-    border-left-color: #F5C542;
-    font-weight: 600;
+.user-chip {
+    display: flex; align-items: center; gap: 8px; padding: 6px 4px; 
 }
+
+.chip-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--dourado); color: var(--azul);
+    font-weight: 700; font-size: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+.chip-name  { font-size: 12.5px; font-weight: 600; color: var(--branco); line-height: 1.2; }
+.chip-role  { font-size: 10px; color: var(--cinza-cl); }
+.chip-logout { margin-left: auto; font-size: 16px; color: var(--cinza-cl); cursor: pointer; transition: color .15s; }
+.chip-logout:hover { color: var(--vermelho); }
+
+.dica-dia {
+    margin-top: 10px; background: rgba(212,175,55,.1);
+    border-radius: 8px; padding: 10px 12px;
+    font-size: 11px; color: var(--cinza-cl); line-height: 1.5;
+}
+
+.dica-dia strong { color: var(--dourado2); display: block; margin-bottom: 3px; }
