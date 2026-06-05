@@ -21,7 +21,7 @@
 
 body {
     font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
+    background: var(--azul-hover);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -32,15 +32,17 @@ body {
 /* ── CONTAINER PRINCIPAL ── */
 .login-wrap {
     display: flex;
-    width: 900px;
-    max-width: 100%;
-    min-height: 580px;
+    width: 100%;
+    max-width: 960px; 
+    min-height: 600px; 
     border-radius: 24px;
     overflow: hidden;
-    background: var(--branco);
-    border: 1px solid rgba(0, 0, 0, .05);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 
-                0 20px 48px -10px rgba(0, 0, 0, 0.1);
+    background: var(--branco, #ffffff); 
+    border: 1px solid rgba(0, 0, 0, 0.25); 
+    box-shadow: 
+        0 12px 32px -4px rgba(0, 0, 0, 0.25),
+        0 4px 12px -2px rgba(0, 0, 0, 0.25);
+    margin: 0 auto; 
 }
 
 /* ── LADO ESQUERDO (BRANDING) ── */
@@ -53,41 +55,19 @@ body {
     padding: 48px;
     position: relative;
     overflow: hidden;
+    max-width: 100%;
 }
-
-/* Elementos Decorativos (Círculos) */
-.login-brand::before, .login-brand::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.login-brand::before {
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(212,175,55,0.12) 0%, transparent 70%);
-    bottom: -100px; left: -100px;
-}
-
-.login-brand::after {
-    width: 180px; height: 180px;
-    background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%);
-    top: -50px; right: -50px;
-}
-
-.brand-logo-area { position: relative; z-index: 2; }
 
 .brand-logo {
-    width: 48px;
-    height: 48px;
-    background: var(--dourado);
+    width: 220px;
+    height: 80px;
+    background: var(--azul);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 40px;
     font-size: 24px;
-    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
 }
 
 .brand-title {
@@ -100,6 +80,7 @@ body {
 
 .brand-sub {
     font-size: 14px;
+    margin-top: -200px;
     color: rgba(255, 255, 255, 0.5);
     line-height: 1.6;
     font-weight: 300;
