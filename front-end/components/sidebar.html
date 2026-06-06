@@ -4,25 +4,22 @@
         <span class="nav-icon">⊞</span>
         Dashboard
     </a>
-
     <a id="nav-ideias" class="nav-item" href="ideias.html">
         <span class="nav-icon"><i class="fa-regular fa-lightbulb"></i></span>
         Minhas Ideias
     </a>
-
-    <a id="nav-explorar" class="nav-item" href="explorar.html">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        Explorar
-    </a>
-
     <a id="nav-recompensas" class="nav-item" href="recompensas.html">
         <i class="fa-solid fa-trophy"></i>
         Recompensas
     </a>
-
     <a id="nav-configuracoes" class="nav-item" href="configuracoes.html">
         <i class="fa-solid fa-gear"></i>
         Configurações
+    </a>
+    <!-- Visível apenas para admin e gestor -->
+    <a id="nav-admin" class="nav-item" href="gestao-usuarios.html" style="display:none">
+        <i class="fa-solid fa-users-gear"></i>
+        Gestão de Usuários
     </a>
 
     <div class="sidebar-footer">
@@ -32,13 +29,10 @@
                 <div class="chip-name" id="sidebarNome">Carregando...</div>
                 <div class="chip-role" id="sidebarCargo">--</div>
             </div>
-
-            <!-- Ícone de sair — chama logout() definido em api.js -->
             <span class="chip-logout" title="Sair da conta" onclick="logout()">↪</span>
         </div>
-
         <div class="dica-dia">
-            <strong>💡 Dica do Dia</strong>
+            <strong> Dica do Dia</strong>
             Ideias com alto impacto e detalhamento completo têm 3x mais chance de aprovação!
         </div>
     </div>
@@ -48,14 +42,14 @@
     (function initSidebar() {
         try {
             const usu = JSON.parse(localStorage.getItem('ni_usuario') || 'null');
-            if (usu) {
-                const elNome     = document.getElementById('sidebarNome');
-                const elCargo    = document.getElementById('sidebarCargo');
-                const elIniciais = document.getElementById('sidebarAvatarIniciais');
-
-                if (elNome)     elNome.textContent     = usu.nome    || 'Usuário';
-                if (elCargo)    elCargo.textContent     = usu.cargo   || 'Colaborador';
-                if (elIniciais) elIniciais.textContent  = usu.iniciais || '?';
+            if (!usu) return;
+            const el = (id) => document.getElementById(id);
+            if (el('sidebarNome'))           el('sidebarNome').textContent           = usu.nome     || 'Usuário';
+            if (el('sidebarCargo'))          el('sidebarCargo').textContent          = usu.cargo    || 'Colaborador';
+            if (el('sidebarAvatarIniciais')) el('sidebarAvatarIniciais').textContent = usu.iniciais || '?';
+            if (usu.tipo === 'admin' || usu.tipo === 'gestor') {
+                const a = el('nav-admin');
+                if (a) a.style.display = 'flex';
             }
         } catch(e) { console.error('Sidebar init error:', e); }
     })();

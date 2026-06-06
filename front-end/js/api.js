@@ -13,7 +13,7 @@ function checkAuth() {
 function logout() {
   localStorage.removeItem('ni_token');
   localStorage.removeItem('ni_usuario');
-  window.location.href = 'login.html';
+  window.location.href = '../login.html';
 }
 
 // ── FETCH HELPER ──────────────────────────────────────────────────────────────

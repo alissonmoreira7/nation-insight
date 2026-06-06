@@ -1,4 +1,6 @@
-/* ── CONFIGURAÇÕES GLOBAIS ── */
+/* ==========================================
+   1. VARIÁVEIS E CONFIGURAÇÕES GLOBAIS
+   ========================================== */
 :root {
     --azul:       #0A2540;
     --azul-hover: #0d2d4a;
@@ -16,7 +18,8 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    -webkit-font-smoothing: antialiased; /* Deixa a fonte mais nítida */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -29,25 +32,51 @@ body {
     padding: 20px;
 }
 
-/* ── CONTAINER PRINCIPAL ── */
+/* ==========================================
+   2. ANIMAÇÕES (KEYFRAMES)
+   ========================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%   { transform: translateY(0px); }
+    50%  { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+/* ==========================================
+   3. LAYOUT PRINCIPAL (CONTAINERS)
+   ========================================== */
 .login-wrap {
     display: flex;
     width: 100%;
     max-width: 960px; 
     min-height: 600px; 
+    background: var(--branco); 
     border-radius: 24px;
-    overflow: hidden;
-    background: var(--branco, #ffffff); 
     border: 1px solid rgba(0, 0, 0, 0.25); 
     box-shadow: 
         0 12px 32px -4px rgba(0, 0, 0, 0.25),
         0 4px 12px -2px rgba(0, 0, 0, 0.25);
-    margin: 0 auto; 
+    overflow: hidden;
+    margin: 0 auto;
+    
 }
 
-/* ── LADO ESQUERDO (BRANDING) ── */
+/* ==========================================
+   4. LADO ESQUERDO (BRANDING)
+   ========================================== */
 .login-brand {
     width: 340px;
+    max-width: 100%;
     background: var(--azul);
     display: flex;
     flex-direction: column;
@@ -55,7 +84,6 @@ body {
     padding: 48px;
     position: relative;
     overflow: hidden;
-    max-width: 100%;
 }
 
 .brand-logo {
@@ -103,12 +131,15 @@ body {
 }
 
 .brand-badge-dot {
-    width: 6px; height: 6px;
+    width: 6px; 
+    height: 6px;
     border-radius: 50%;
     background: var(--dourado);
 }
 
-/* ── LADO DIREITO (FORMULÁRIO) ── */
+/* ==========================================
+   5. LADO DIREITO (FORMULÁRIO)
+   ========================================== */
 .login-form-wrap {
     flex: 1;
     display: flex;
@@ -117,6 +148,7 @@ body {
     padding: 56px;
 }
 
+/* -- Cabeçalho do Formulário -- */
 .form-header { margin-bottom: 32px; }
 
 .form-eyebrow {
@@ -142,7 +174,7 @@ body {
     font-weight: 400;
 }
 
-/* ── INPUTS E CAMPOS ── */
+/* -- Inputs e Labels -- */
 .form-group { margin-bottom: 20px; }
 
 .form-group label {
@@ -162,7 +194,7 @@ body {
     font-family: inherit;
     color: var(--azul);
     background: #FAFAF9;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease; /* Transição melhorada */
 }
 
 .form-group input:focus {
@@ -172,7 +204,7 @@ body {
     outline: none;
 }
 
-/* ── AÇÕES E BOTÃO ── */
+/* -- Opções Extras (Lembrar/Esqueci) -- */
 .form-options {
     display: flex;
     align-items: center;
@@ -190,7 +222,8 @@ body {
 }
 
 .form-checkbox {
-    width: 18px; height: 18px;
+    width: 18px; 
+    height: 18px;
     border: 2px solid var(--borda);
     border-radius: 6px;
     transition: all 0.2s;
@@ -206,8 +239,14 @@ body {
     color: var(--azul);
     text-decoration: none;
     font-weight: 500;
+    transition: color 0.2s ease;
 }
 
+.form-forgot:hover {
+    color: var(--dourado);
+}
+
+/* -- Botão de Submit -- */
 .btn-login {
     width: 100%;
     padding: 14px;
@@ -218,16 +257,21 @@ body {
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-login:hover {
     background: var(--azul-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(10, 37, 64, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(10, 37, 64, 0.25);
 }
 
-/* ── FINALIZAÇÃO ── */
+.btn-login:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(10, 37, 64, 0.2);
+}
+
+/* -- Rodapé e Divisores -- */
 .divider {
     display: flex;
     align-items: center;
@@ -258,16 +302,45 @@ body {
     color: var(--azul);
     font-weight: 600;
     text-decoration: none;
+    transition: color 0.2s ease;
 }
 
-/* ── RESPONSIVIDADE ── */
+.form-footer a:hover {
+    color: var(--dourado);
+}
+
+/* ==========================================
+   6. RESPONSIVIDADE (MEDIA QUERIES)
+   ========================================== */
 @media (max-width: 800px) {
-    .login-wrap { width: 450px; }
-    .login-brand { display: none; }
+    .login-wrap { 
+        width: 450px; 
+    }
+    .login-brand { 
+        display: none; 
+    }
 }
 
 @media (max-width: 480px) {
-    .login-wrap { border-radius: 0; min-height: 100vh; }
-    body { padding: 0; }
-    .login-form-wrap { padding: 40px 24px; }
+    body { 
+        padding: 0; 
+    }
+    .login-wrap { 
+        border-radius: 0; 
+        min-height: 100vh; 
+        border: none;
+    }
+    .login-form-wrap { 
+        padding: 40px 24px; 
+    }
+}
+
+#bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none; 
 }
