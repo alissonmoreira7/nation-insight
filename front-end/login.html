@@ -1,54 +1,53 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login — NationInsight</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — NationInsight</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/coresgerais.css">
+  </head>
 
-  <link rel="stylesheet" href="css/login.css">
-  <link rel="stylesheet" href="css/coresgerais.css">
-</head>
-<body>
+  <body>
+    <div class="login-wrap">
 
-<div class="login-wrap">
+      <!-- Lado esquerdo — branding -->
+      <div class="login-brand">
+        <img src="imagens/logonation.png" class="brand-logo" alt="Logo da NationInsight">
+        <div class="brand-sub">Plataforma de gestão de ideias e inovação da NationCapital</div>
+        <div class="brand-badges">
+          <div class="brand-badge"><span></span> Submeta suas ideias</div>
+          <div class="brand-badge"><span></span> Ganhe pontos e recompensas</div>
+          <div class="brand-badge"><span></span> Acompanhe o progresso</div>
+        </div>
+      </div>
 
-  <!-- Lado esquerdo — branding -->
-  <div class="login-brand">
-    <img src="imagens/logonation.png" class="brand-logo" alt="Logo da NationInsight">
-    <div class="brand-sub">Plataforma de gestão de ideias e inovação da NationCapital</div>
-    <div class="brand-badges">
-      <div class="brand-badge"><span></span> Submeta suas ideias</div>
-      <div class="brand-badge"><span></span> Ganhe pontos e recompensas</div>
-      <div class="brand-badge"><span></span> Acompanhe o progresso</div>
+      <!-- Lado direito — formulário -->
+      <div class="login-form-wrap">
+        <div class="form-title" id="formTitulo">Bem-vindo</div>
+        <div class="form-sub" id="formSub">Entre com sua conta para continuar</div>
+
+        <div class="alerta" id="alerta"></div>
+
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="fEmail" placeholder="seu@email.com" autocomplete="email">
+          <div class="erro-msg" id="errEmail">Informe um e-mail válido</div>
+        </div>
+
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" id="fSenha" placeholder="••••••••" autocomplete="current-password">
+          <div class="erro-msg" id="errSenha">Informe sua senha</div>
+        </div>
+
+        <button class="btn-login" id="btnSubmit" onclick="submeter()">Entrar</button>
+
     </div>
-  </div>
 
-  <!-- Lado direito — formulário -->
-  <div class="login-form-wrap">
-    <div class="form-title" id="formTitulo">Bem-vindo de volta</div>
-    <div class="form-sub" id="formSub">Entre com sua conta para continuar</div>
+    <script src="js/api.js"></script>
+    <script src="js/login.js"></script>
 
-    <div class="alerta" id="alerta"></div>
-
-    <div class="form-group">
-      <label>E-mail</label>
-      <input type="email" id="fEmail" placeholder="seu@email.com" autocomplete="email">
-      <div class="erro-msg" id="errEmail">Informe um e-mail válido</div>
-    </div>
-
-    <div class="form-group">
-      <label>Senha</label>
-      <input type="password" id="fSenha" placeholder="••••••••" autocomplete="current-password">
-      <div class="erro-msg" id="errSenha">Informe sua senha</div>
-    </div>
-
-    <button class="btn-login" id="btnSubmit" onclick="submeter()">Entrar</button>
-
-</div>
-
-<script src="js/api.js"></script>
-<script src="js/login.js"></script>
-
-</body>
+  </body>
 </html>
