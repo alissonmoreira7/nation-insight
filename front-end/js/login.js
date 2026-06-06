@@ -1,120 +1,153 @@
-    let modoAtual = 'login'; // 'login' | 'cadastro'
+let modoAtual = 'login'; // 'login' | 'cadastro'
 
-    // Permite Enter para submeter
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Enter') submeter();
-    });
+// Permite Enter para submeter
+document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') submeter();
+});
 
-    function alternarModo(e) {
-        e.preventDefault();
-        modoAtual = modoAtual === 'login' ? 'cadastro' : 'login';
-        limparAlertas();
-
-        const ehCadastro = modoAtual === 'cadastro';
-        document.getElementById('formTitulo').textContent  = ehCadastro ? 'Criar conta' : 'Bem-vindo de volta';
-        document.getElementById('formSub').textContent     = ehCadastro ? 'Preencha os dados para se registrar' : 'Entre com sua conta para continuar';
-        document.getElementById('btnSubmit').textContent   = ehCadastro ? 'Criar conta' : 'Entrar';
-        document.getElementById('campoNome').style.display = ehCadastro ? 'block' : 'none';
-        document.getElementById('footerTexto').textContent = ehCadastro ? 'Já tem conta?' : 'Não tem conta?';
-        document.getElementById('btnAlternar').textContent = ehCadastro ? 'Entrar' : 'Criar conta';
-    }
-
-    async function submeter() {
+function alternarModo(e) {
+    if (e) e.preventDefault();
+    modoAtual = modoAtual === 'login' ? 'cadastro' : 'login';
     limparAlertas();
 
-        const email = document.getElementById('fEmail').value.trim();
-        const senha = document.getElementById('fSenha').value.trim();
-        const nome  = document.getElementById('fNome').value.trim();
+    const ehCadastro = modoAtual === 'cadastro';
+    
+    const elTitulo = document.getElementById('formTitulo');
+    if (elTitulo) elTitulo.textContent = ehCadastro ? 'Criar conta' : 'Bem-vindo de volta';
+    
+    const elSub = document.getElementById('formSub');
+    if (elSub) elSub.textContent = ehCadastro ? 'Preencha os dados para se registrar' : 'Entre com sua conta para continuar';
+    
+    const btnSubmit = document.getElementById('btnSubmit');
+    if (btnSubmit) btnSubmit.textContent = ehCadastro ? 'Criar conta' : 'Entrar';
+    
+    const elCampoNome = document.getElementById('campoNome');
+    if (elCampoNome) elCampoNome.style.display = ehCadastro ? 'block' : 'none';
+    
+    const elFooter = document.getElementById('footerTexto');
+    if (elFooter) elFooter.textContent = ehCadastro ? 'Já tem conta?' : 'Não tem conta?';
+    
+    const btnAlternar = document.getElementById('btnAlternar');
+    if (btnAlternar) btnAlternar.textContent = ehCadastro ? 'Entrar' : 'Criar conta';
+}
 
-        // Validação básica
-        let valido = true;
-        if (!email || !email.includes('@')) {
-        document.getElementById('fEmail').classList.add('erro');
-        document.getElementById('errEmail').classList.add('visivel');
+async function submeter() {
+    limparAlertas();
+
+    const elEmail = document.getElementById('fEmail');
+    const elSenha = document.getElementById('fSenha');
+    const elNome = document.getElementById('fNome');
+
+    // AQUI ESTAVA O ERRO! Agora estamos capturando o nome corretamente:
+    const email = elEmail ? elEmail.value.trim() : '';
+    const senha = elSenha ? elSenha.value.trim() : '';
+    const nome = elNome ? elNome.value.trim() : '';
+
+    // Validação básica
+    let valido = true;
+    
+    if (!email || !email.includes('@')) {
+        if (elEmail) elEmail.classList.add('erro');
+        const errEmail = document.getElementById('errEmail');
+        if (errEmail) errEmail.classList.add('visivel');
         valido = false;
     }
+    
     if (!senha) {
-        document.getElementById('fSenha').classList.add('erro');
-        document.getElementById('errSenha').classList.add('visivel');
+        if (elSenha) elSenha.classList.add('erro');
+        const errSenha = document.getElementById('errSenha');
+        if (errSenha) errSenha.classList.add('visivel');
         valido = false;
     }
+    
     if (modoAtual === 'cadastro' && !nome) {
-        document.getElementById('fNome').classList.add('erro');
-        document.getElementById('errNome').classList.add('visivel');
+        if (elNome) elNome.classList.add('erro');
+        const errNome = document.getElementById('errNome');
+        if (errNome) errNome.classList.add('visivel');
         valido = false;
     }
+    
     if (!valido) return;
 
-        const btn = document.getElementById('btnSubmit');
+    const btn = document.getElementById('btnSubmit');
+    if (btn) {
         btn.disabled = true;
         btn.textContent = ' Aguarde...';
+    }
 
-        try {
+    try {
         if (modoAtual === 'cadastro') {
-        // Cria conta
-        const res = await fetch('http://localhost:3000/api/auth/registrar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, email, senha })
-    });
-    const data = await res.json();
+            // Cria conta
+            const res = await fetch('http://localhost:3000/api/auth/registrar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, email, senha }) 
+            });
+            const data = await res.json();
 
-    if (!res.ok) {
-        mostrarAlerta('erro', data.erro || 'Erro ao criar conta');
-        return;
-    }
+            if (!res.ok) {
+                mostrarAlerta('erro', data.erro || 'Erro ao criar conta');
+                return;
+            }
 
-    mostrarAlerta('sucesso', ' Conta criada! Fazendo login...');
-        setTimeout(() => alternarModo({ preventDefault: () => {} }), 800);
+            mostrarAlerta('sucesso', ' Conta criada! Fazendo login...');
+            setTimeout(() => alternarModo(), 800);
 
-    } else {
-        // Login
-        const res = await fetch('http://localhost:3000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, senha })
-    });
-    const data = await res.json();
+        } else {
+            // Login
+            const res = await fetch('http://localhost:3000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, senha })
+            });
+            const data = await res.json();
 
-    if (!res.ok) {
-        mostrarAlerta('erro', data.erro || 'E-mail ou senha incorretos');
-        return;
-    }
+            if (!res.ok) {
+                mostrarAlerta('erro', data.erro || 'E-mail ou senha incorretos');
+                return;
+            }
 
-    // Salva sessão e redireciona
-    localStorage.setItem('ni_token', data.token);
-    localStorage.setItem('ni_usuario', JSON.stringify(data.usuario));
-    mostrarAlerta('sucesso', ' Login realizado! Redirecionando...');
-    setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
-    }
+            // Salva sessão e redireciona
+            localStorage.setItem('ni_token', data.token);
+            localStorage.setItem('ni_usuario', JSON.stringify(data.usuario));
+            mostrarAlerta('sucesso', ' Login realizado! Redirecionando...');
+            setTimeout(() => { window.location.href = 'pages/dashboard.html'; }, 600);
+        }
 
     } catch (err) {
         mostrarAlerta('erro', ' Não foi possível conectar ao servidor. Verifique se o back-end está rodando.');
     } finally {
-        btn.disabled = false;
-        btn.textContent = modoAtual === 'cadastro' ? 'Criar conta' : 'Entrar';
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = modoAtual === 'cadastro' ? 'Criar conta' : 'Entrar';
+        }
     }
 }
 
-    function mostrarAlerta(tipo, msg) {
-        const el = document.getElementById('alerta');
+function mostrarAlerta(tipo, msg) {
+    const el = document.getElementById('alerta');
+    if (el) {
         el.className = 'alerta ' + tipo;
         el.textContent = msg;
     }
+}
 
-    function limparAlertas() {
-        document.getElementById('alerta').className = 'alerta';
-        ['fEmail','fSenha','fNome'].forEach(id => {
+function limparAlertas() {
+    const elAlerta = document.getElementById('alerta');
+    if (elAlerta) elAlerta.className = 'alerta';
+    
+    ['fEmail', 'fSenha', 'fNome'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('erro');
     });
-        ['errEmail','errSenha','errNome'].forEach(id => {
+    
+    ['errEmail', 'errSenha', 'errNome'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('visivel');
     });
-    }
+}
 
-    // Se já tiver token válido, vai direto para ideias
-    if (localStorage.getItem('ni_token')) {
+// Se já tiver token válido, vai direto para ideias
+if (localStorage.getItem('ni_token')) {
     window.location.href = 'ideias.html';
 }

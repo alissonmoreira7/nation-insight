@@ -9,10 +9,10 @@
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        <link rel="stylesheet" href="css/dashboard.css">
-        <link rel="stylesheet" href="css/topbar.css">
-        <link rel="stylesheet" href="css/sidebar.css">
-        <link rel="stylesheet" href="css/coresgerais.css">
+        <link rel="stylesheet" href="../css/dashboard.css">
+        <link rel="stylesheet" href="../css/topbar.css">
+        <link rel="stylesheet" href="../css/sidebar.css">
+        <link rel="stylesheet" href="../css/coresgerais.css">
     </head>
     <body>
     <div id="topbar-container"></div>
@@ -122,13 +122,13 @@
 
     <div class="toast-wrap" id="toastWrap"></div>
 
-    <script src="js/api.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/injetahtml.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script src="../js/injetahtml.js"></script>
 
     <script>
-        carregarComponente('components/sidebar.html', 'sidebar-container', 'nav-dashboard');
-        carregarComponente('components/topbar.html',  'topbar-container');
+        carregarComponente('../components/sidebar.html', 'sidebar-container', 'nav-dashboard');
+        carregarComponente('../components/topbar.html',  'topbar-container');
 
         document.getElementById('dataAtual').textContent =
         new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });

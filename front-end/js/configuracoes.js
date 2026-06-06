@@ -1,6 +1,3 @@
-// js/configuracoes.js
-// Requer api.js no HTML antes deste script
-
 async function initConfiguracoes() {
     checkAuth();
     await carregarDadosUsuario();

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Gestão de Usuários — NationInsight</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+        <link rel="stylesheet" href="../css/dashboard.css">
+        <link rel="stylesheet" href="../css/gestao-usuarios.css">
+        <link rel="stylesheet" href="../css/topbar.css">
+        <link rel="stylesheet" href="../css/sidebar.css">
+        <link rel="stylesheet" href="../css/coresgerais.css">    
+    </head>
+    <body>
+
+        <div id="topbar-container"></div>
+
+        <div class="layout">
+            <div id="sidebar-container"></div>
+
+            <main class="main-content">
+
+            <!-- Header -->
+            <div class="page-header" style="display:flex;align-items:flex-start;gap:16px">
+                <div style="flex:1">
+                <h1>Gestão de Usuários</h1>
+                <p>Cadastre colaboradores e gestores, edite perfis e controle acessos</p>
+                </div>
+                <div class="page-actions">
+                <button class="btn-primary" onclick="abrirModalNovo()">+ Novo Usuário</button>
+                </div>
+            </div>
+
+            <!-- KPIs rápidos -->
+            <div class="kpi-grid" id="statsGrid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+                <div class="kpi-card skeleton" style="height:80px"></div>
+                <div class="kpi-card skeleton" style="height:80px"></div>
+                <div class="kpi-card skeleton" style="height:80px"></div>
+                <div class="kpi-card skeleton" style="height:80px"></div>
+            </div>
+
+            <!-- Tabela -->
+            <div class="table-card">
+                <div class="table-toolbar">
+                <input class="table-search" id="searchInput" type="text" placeholder="🔍 Buscar por nome ou e-mail..." oninput="filtrarTabela()">
+                <select class="filter-sel" id="filtroPerfilSel" onchange="filtrarTabela()">
+                    <option value="">Todos os perfis</option>
+                    <option value="colaborador">Colaborador</option>
+                    <option value="gestor">Gestor</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <span style="font-size:12px;color:#9ca3af;margin-left:auto" id="countLabel">0 usuários</span>
+                </div>
+                <div id="tabelaWrap">
+                <div class="empty-table">⏳ Carregando...</div>
+                </div>
+            </div>
+
+            </main>
+        </div>
+
+        <!-- ── MODAL CRIAR / EDITAR ── -->
+        <div class="modal-overlay" id="modalForm">
+            <div class="modal-box">
+            <div class="modal-title" id="modalTitulo">Novo Usuário</div>
+            <div class="modal-alerta" id="modalAlerta"></div>
+
+            <div class="form-row">
+                <label>Nome completo</label>
+                <input type="text" id="fNome" placeholder="Ana Costa">
+            </div>
+            <div class="form-row">
+                <label>E-mail</label>
+                <input type="email" id="fEmail" placeholder="ana@empresa.com">
+            </div>
+            <div class="form-row" id="senhaWrap">
+                <label>Senha</label>
+                <input type="password" id="fSenha" placeholder="Mínimo 6 caracteres">
+                <div class="form-hint" id="senhaHint">Deixe em branco para não alterar</div>
+            </div>
+            <div class="form-row">
+                <label>Cargo / Função</label>
+                <input type="text" id="fCargo" placeholder="ex: Analista de Dados">
+            </div>
+            <div class="form-row">
+                <label>Perfil de Acesso</label>
+                <select id="fPerfil">
+                <option value="colaborador">Colaborador</option>
+                <option value="gestor">Gestor</option>
+                <option value="admin">Administrador</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+                <button class="btn-primary" id="btnSalvar" onclick="salvarUsuario()">Criar Usuário</button>
+            </div>
+            </div>
+        </div>
+
+        <!-- ── MODAL CONFIRMAR EXCLUSÃO ── -->
+        <div class="modal-overlay" id="modalDel">
+            <div class="modal-box" style="width:360px">
+            <div class="modal-title">Confirmar Exclusão</div>
+            <p style="font-size:13px;color:#6b7280;margin-bottom:20px" id="delDesc">
+                Este usuário será removido permanentemente.
+            </p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+                <button class="btn-primary" style="background:#ef4444" id="btnConfirmarDel" onclick="confirmarExclusao()">Excluir</button>
+            </div>
+            </div>
+        </div>
+
+        <div class="toast-wrap" id="toastWrap"></div>
+
+        <script src="../js/api.js"></script>
+        <script src="../js/gestao-usuarios.js"></script>
+        <script src="../js/injetahtml.js"></script>
+        <script>
+            carregarComponente('../components/sidebar.html', 'sidebar-container', 'nav-admin');
+            carregarComponente('../components/topbar.html',  'topbar-container');
+        </script>
+    </body>
+</html>
