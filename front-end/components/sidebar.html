@@ -1,27 +1,44 @@
-<!-- SIDEBAR -->
 <aside class="sidebar">
-    <a id="nav-dashboard" class="nav-item" href="dashboard.html">
-        <span class="nav-icon">⊞</span>
+
+    <!-- ── COLABORADOR ─────────────────────────────── -->
+    <a id="nav-dashboard"      class="nav-item" href="dashboard.html">
+        <span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span>
         Dashboard
     </a>
-    <a id="nav-ideias" class="nav-item" href="ideias.html">
+    <a id="nav-ideias"         class="nav-item" href="ideias.html">
         <span class="nav-icon"><i class="fa-regular fa-lightbulb"></i></span>
         Minhas Ideias
     </a>
-    <a id="nav-recompensas" class="nav-item" href="recompensas.html">
-        <i class="fa-solid fa-trophy"></i>
+
+    <!-- ── GESTOR ONLY ─────────────────────────────── -->
+    <a id="nav-gestao-ideias"  class="nav-item" href="gestor-ideias.html" style="display:none">
+        <span class="nav-icon"><i class="fa-solid fa-list-check"></i></span>
+        Gestão de Ideias
+    </a>
+
+    <!-- ── COLABORADOR + GESTOR ────────────────────── -->
+    <a id="nav-recompensas"    class="nav-item" href="recompensas.html">
+        <span class="nav-icon"><i class="fa-solid fa-trophy"></i></span>
         Recompensas
     </a>
-    <a id="nav-configuracoes" class="nav-item" href="configuracoes.html">
-        <i class="fa-solid fa-gear"></i>
-        Configurações
+
+    <!-- ── ADMIN ONLY ──────────────────────────────── -->
+    <a id="nav-admin-ideias"   class="nav-item" href="gestor-ideias.html" style="display:none">
+        <span class="nav-icon"><i class="fa-solid fa-list-check"></i></span>
+        Gestão de Ideias
     </a>
-    <!-- Visível apenas para admin e gestor -->
-    <a id="nav-admin" class="nav-item" href="gestao-usuarios.html" style="display:none">
-        <i class="fa-solid fa-users-gear"></i>
+    <a id="nav-admin-usuarios" class="nav-item" href="gestao-usuarios.html" style="display:none">
+        <span class="nav-icon"><i class="fa-solid fa-users-gear"></i></span>
         Gestão de Usuários
     </a>
 
+    <!-- ── TODOS ───────────────────────────────────── -->
+    <a id="nav-configuracoes"  class="nav-item" href="configuracoes.html">
+        <span class="nav-icon"><i class="fa-solid fa-gear"></i></span>
+        Configurações
+    </a>
+
+    <!-- ── RODAPÉ ──────────────────────────────────── -->
     <div class="sidebar-footer">
         <div class="user-chip">
             <div class="chip-avatar" id="sidebarAvatarIniciais">--</div>
@@ -32,25 +49,59 @@
             <span class="chip-logout" title="Sair da conta" onclick="logout()">↪</span>
         </div>
         <div class="dica-dia">
-            <strong> Dica do Dia</strong>
-            Ideias com alto impacto e detalhamento completo têm 3x mais chance de aprovação!
+            <strong>💡 Dica do Dia</strong>
+            Ideias com alto impacto e detalhamento completo têm 3× mais chance de aprovação!
         </div>
     </div>
 </aside>
 
 <script>
-    (function initSidebar() {
-        try {
-            const usu = JSON.parse(localStorage.getItem('ni_usuario') || 'null');
-            if (!usu) return;
-            const el = (id) => document.getElementById(id);
-            if (el('sidebarNome'))           el('sidebarNome').textContent           = usu.nome     || 'Usuário';
-            if (el('sidebarCargo'))          el('sidebarCargo').textContent          = usu.cargo    || 'Colaborador';
-            if (el('sidebarAvatarIniciais')) el('sidebarAvatarIniciais').textContent = usu.iniciais || '?';
-            if (usu.tipo === 'admin' || usu.tipo === 'gestor') {
-                const a = el('nav-admin');
-                if (a) a.style.display = 'flex';
-            }
-        } catch(e) { console.error('Sidebar init error:', e); }
-    })();
+(function initSidebar() {
+    try {
+        const usu = JSON.parse(localStorage.getItem('ni_usuario') || 'null');
+        if (!usu) return;
+
+        const el     = (id) => document.getElementById(id);
+        const perfil = String(usu.tipo || usu.perfilacesso_usu || usu.perfil || '').toLowerCase();
+
+        // Preenche dados do usuário
+        if (el('sidebarNome'))           el('sidebarNome').textContent           = usu.nome     || 'Usuário';
+        if (el('sidebarCargo'))          el('sidebarCargo').textContent          = usu.cargo    || 'Colaborador';
+        if (el('sidebarAvatarIniciais')) el('sidebarAvatarIniciais').textContent = usu.iniciais || '??';
+
+        // Esconde TUDO que não é padrão e depois mostra o que cada perfil precisa
+        const show = (id) => { const a = el(id); if (a) a.style.display = 'flex'; };
+        const hide = (id) => { const a = el(id); if (a) a.style.display = 'none';  };
+
+        if (perfil === 'colaborador') {
+            // dashboard ✔ | minhas ideias ✔ | recompensas ✔ | configurações ✔
+            // (todos visíveis por padrão — nada a fazer)
+
+        } else if (perfil === 'gestor') {
+            // dashboard ✔ | minhas ideias ✔ | gestão ideias ✔ | recompensas ✔ | configurações ✔
+            show('nav-gestao-ideias');
+
+        } else if (perfil === 'admin') {
+            // dashboard ✔ | gestão ideias ✔ | gestão usuários ✔ | configurações ✔
+            hide('nav-ideias');
+            hide('nav-recompensas');
+            show('nav-admin-ideias');
+            show('nav-admin-usuarios');
+        }
+
+        // Marca item ativo com base na URL atual
+        const paginaAtual = window.location.pathname.split('/').pop();
+        const mapaAtivo = {
+            'dashboard.html':       'nav-dashboard',
+            'ideias.html':          'nav-ideias',
+            'gestor-ideias.html':   perfil === 'admin' ? 'nav-admin-ideias' : 'nav-gestao-ideias',
+            'gestao-usuarios.html': 'nav-admin-usuarios',
+            'recompensas.html':     'nav-recompensas',
+            'configuracoes.html':   'nav-configuracoes',
+        };
+        const idAtivo = mapaAtivo[paginaAtual];
+        if (idAtivo && el(idAtivo)) el(idAtivo).classList.add('active');
+
+    } catch (e) { console.error('Sidebar init error:', e); }
+})();
 </script>

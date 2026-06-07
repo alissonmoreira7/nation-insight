@@ -1,6 +1,3 @@
-// js/gestao-usuarios.js
-// Requer: <script src="js/api.js"></script> ANTES
-
 // ── ESTADO ────────────────────────────────────────────────────────────────────
 let todosUsuarios = [];
 let editandoId    = null;
@@ -14,8 +11,24 @@ function iniciais(nome){ return nome.split(' ').map(p=>p[0]).join('').substring(
 // ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
   checkAuth();
-  checkAdminFront(); // bloqueia no front se não for admin/gestor
-  await Promise.all([carregarStats(), carregarUsuarios()]);
+  checkAdminFront();
+  await Promise.all([carregarStats(), carregarUsuarios(), carregarSetores()]);
+}
+
+// ── SETORES ───────────────────────────────────────────────────────────────────
+async function carregarSetores() {
+  try {
+    const setores = await api('GET', '/admin/setores');
+    const sel = document.getElementById('fSetor');
+    setores.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.nome;
+      opt.textContent = s.nome;
+      sel.appendChild(opt);
+    });
+  } catch (err) {
+    console.warn('Não foi possível carregar setores:', err.message);
+  }
 }
 
 function checkAdminFront() {
@@ -140,6 +153,7 @@ function abrirModalNovo() {
   document.getElementById('fEmail').value  = '';
   document.getElementById('fSenha').value  = '';
   document.getElementById('fCargo').value  = '';
+  document.getElementById('fSetor').value  = '';
   document.getElementById('fPerfil').value = 'colaborador';
   document.getElementById('fEmail').disabled = false;
   esconderAlerta();
@@ -156,9 +170,10 @@ function abrirModalEditar(id) {
   document.getElementById('senhaHint').style.display = 'block';
   document.getElementById('fNome').value   = u.nome;
   document.getElementById('fEmail').value  = u.email;
-  document.getElementById('fEmail').disabled = true;  // email não pode ser alterado
+  document.getElementById('fEmail').disabled = true;
   document.getElementById('fSenha').value  = '';
   document.getElementById('fCargo').value  = u.cargo || '';
+  document.getElementById('fSetor').value  = u.departamento || '';
   document.getElementById('fPerfil').value = u.perfil;
   esconderAlerta();
   document.getElementById('modalForm').classList.add('open');
@@ -170,6 +185,7 @@ async function salvarUsuario() {
   const email  = document.getElementById('fEmail').value.trim();
   const senha  = document.getElementById('fSenha').value;
   const cargo  = document.getElementById('fCargo').value.trim();
+  const setor  = document.getElementById('fSetor').value;
   const perfil = document.getElementById('fPerfil').value;
 
   if (!nome)  return mostrarAlerta('Informe o nome do usuário');
@@ -182,12 +198,12 @@ async function salvarUsuario() {
 
   try {
     if (editandoId) {
-      const body = { nome, cargo, perfil };
+      const body = { nome, cargo, perfil, departamento: setor };
       if (senha) body.senha = senha;
       await api('PUT', `/admin/usuarios/${editandoId}`, body);
       toast('✅ Usuário atualizado com sucesso');
     } else {
-      await api('POST', '/admin/usuarios', { nome, email, senha, cargo, perfil });
+      await api('POST', '/admin/usuarios', { nome, email, senha, cargo, perfil, departamento: setor });
       toast('✅ Usuário criado com sucesso');
     }
     fecharModal();

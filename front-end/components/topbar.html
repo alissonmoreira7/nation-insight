@@ -1,4 +1,3 @@
-<!-- TOPBAR -->
 <header class="topbar">
     <div class="brand">
         <span class="brand-name">NationInsight</span>
@@ -6,28 +5,26 @@
     </div>
     <input class="search-bar" type="text" placeholder="Buscar insights, colaboradores...">
     <div class="topbar-right">
-        <div class="pontos-badge">
+        
+        <div class="pontos-badge" id="boxPontosTopbar">
             <div>
                 <span>Meus Pontos</span>
                 <strong id="pontosTopbar">0</strong>
             </div>
         </div>
 
-        <!-- Botão de notificações -->
         <div class="notif-wrapper" id="notifWrapper">
             <button class="notif-btn" id="notifBtn" onclick="toggleNotifModal(event)" aria-label="Notificações">
                 🔔
             </button>
 
-            <!-- Modal de notificações (dropdown inline) -->
             <div class="notif-modal" id="notifModal" style="display:none;" role="dialog" aria-label="Painel de notificações">
                 <div class="notif-modal-header">
                     <span class="notif-modal-title">Notificações</span>
                     <button class="notif-mark-all" onclick="marcarTodasLidas()" title="Marcar todas como lidas">✓ Marcar todas</button>
                 </div>
                 <div class="notif-list" id="notifList">
-                    <!-- preenchido pelo JS abaixo -->
-                </div>
+                    </div>
             </div>
         </div>
 
@@ -47,13 +44,22 @@
         const usu = JSON.parse(localStorage.getItem('ni_usuario') || 'null');
         if (usu) {
             const elPontos   = document.getElementById('pontosTopbar');
+            const boxPontos  = document.getElementById('boxPontosTopbar'); 
             const elNome     = document.getElementById('topbarNome');
             const elCargo    = document.getElementById('topbarCargo');
             const elIniciais = document.getElementById('topbarAvatarIniciais');
 
-            if (elPontos)   elPontos.textContent   = usu.pontos    ?? 0;
-            if (elNome)     elNome.textContent      = usu.nome      || 'Usuário';
-            if (elCargo)    elCargo.textContent     = usu.cargo     || 'Colaborador';
+            // AQUI ESTÁ A CORREÇÃO: Pegando 'tipo' e forçando tudo para minúsculo
+            const perfil = String(usu.tipo || usu.perfilacesso_usu || usu.perfil || '').toLowerCase();
+
+            // Se for admin, esconde a caixa de pontos inteira
+            if (perfil === 'admin' && boxPontos) {
+                boxPontos.style.display = 'none';
+            }
+
+            if (elPontos)   elPontos.textContent   = usu.pontos     ?? 0;
+            if (elNome)     elNome.textContent     = usu.nome       || 'Usuário';
+            if (elCargo)    elCargo.textContent    = usu.cargo      || 'Colaborador';
             if (elIniciais) elIniciais.textContent  = usu.iniciais  || '?';
         }
     } catch(e) { console.error('Topbar init error:', e); }
@@ -76,38 +82,7 @@
             tempo: 'há 10 minutos',
             lida: false,
         },
-        {
-            id: 2,
-            icon: '⭐',
-            titulo: 'Você ganhou 50 pontos',
-            desc: 'Parabéns! Sua nova ideia foi registrada e você recebeu 50 pontos de bônus.',
-            tempo: 'há 1 hora',
-            lida: false,
-        },
-        {
-            id: 3,
-            icon: '🔍',
-            titulo: 'Ideia em Análise',
-            desc: 'Sua ideia "Novo Fluxo de Onboarding" entrou em análise pelo gestor de RH.',
-            tempo: 'há 3 horas',
-            lida: false,
-        },
-        {
-            id: 4,
-            icon: '🏆',
-            titulo: 'Ranking atualizado',
-            desc: 'Você subiu para o Top 5 de inovadores do mês. Continue assim!',
-            tempo: 'ontem',
-            lida: true,
-        },
-        {
-            id: 5,
-            icon: '🎁',
-            titulo: 'Nova recompensa disponível',
-            desc: 'O benefício "Troféu Inovador do Mês" foi adicionado ao catálogo de recompensas.',
-            tempo: '2 dias atrás',
-            lida: true,
-        },
+        // ... (resto das suas notificações)
     ];
 
     function renderNotifList() {

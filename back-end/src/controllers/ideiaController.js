@@ -80,10 +80,12 @@ async function criarIdeia(req, res) {
       [titulo, desc, prazo || null, recursos || null, req.usuario.id, categoriaId]
     );
 
-    // REGRA DE NEGÓCIO: pontos NÃO são creditados na criação.
-    // Serão creditados pelo gestor ao avançar o status (ver atualizarStatus).
+    // Credita +15 pontos ao autor pela submissão da ideia
+    await pool.query(
+      'UPDATE tab_usuario SET saldoPontos_usu = saldoPontos_usu + 15 WHERE IdCod_usu = ?',
+      [req.usuario.id]
+    );
 
-    // Busca saldo atual sem alteração
     const [pontosRow] = await pool.query(
       'SELECT saldoPontos_usu AS pontos FROM tab_usuario WHERE IdCod_usu = ?',
       [req.usuario.id]

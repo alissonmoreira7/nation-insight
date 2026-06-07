@@ -335,6 +335,99 @@ body {
     }
 }
 
+/* ==========================================
+   7. MODAL RECUPERAR SENHA
+   ========================================== */
+.modal-rec-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 37, 64, 0.55);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.modal-rec-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-rec-box {
+    background: var(--branco);
+    border-radius: 20px;
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 20px 48px rgba(0,0,0,0.2);
+    transform: translateY(16px);
+    transition: transform 0.25s ease;
+}
+
+.modal-rec-overlay.open .modal-rec-box {
+    transform: translateY(0);
+}
+
+.modal-rec-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: var(--texto-sec);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.modal-rec-close:hover { background: #f3f4f6; }
+
+.modal-rec-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+}
+
+.modal-rec-titulo {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--azul);
+    margin-bottom: 8px;
+}
+
+.modal-rec-sub {
+    font-size: 13px;
+    color: var(--texto-sec);
+    line-height: 1.6;
+    margin-bottom: 4px;
+}
+
+/* Alerta dentro do modal */
+#alertaRec {
+    font-size: 13px;
+    margin-bottom: 0;
+    border-radius: 10px;
+}
+#alertaRec.erro   { background:#fef2f2; color:#dc2626; padding:10px 14px; }
+#alertaRec.sucesso{ background:#f0fdf4; color:#16a34a; padding:10px 14px; }
+
+/* Estado de loading no botão */
+.btn-login:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
 #bg-canvas {
     position: fixed;
     top: 0;

@@ -23,12 +23,79 @@ function alternarModo(e) {
     
     const elCampoNome = document.getElementById('campoNome');
     if (elCampoNome) elCampoNome.style.display = ehCadastro ? 'block' : 'none';
+
+    // Oculta o link "Esqueci minha senha" no modo cadastro
+    const elOpcoes = document.getElementById('opcoesLogin');
+    if (elOpcoes) elOpcoes.style.display = ehCadastro ? 'none' : 'flex';
     
     const elFooter = document.getElementById('footerTexto');
     if (elFooter) elFooter.textContent = ehCadastro ? 'Já tem conta?' : 'Não tem conta?';
     
     const btnAlternar = document.getElementById('btnAlternar');
     if (btnAlternar) btnAlternar.textContent = ehCadastro ? 'Entrar' : 'Criar conta';
+}
+
+// ── RECUPERAÇÃO DE SENHA ──────────────────────────────────────────────────────
+
+function abrirRecuperacao(e) {
+    if (e) e.preventDefault();
+    document.getElementById('recEmail').value = '';
+    document.getElementById('alertaRec').className = 'alerta';
+    document.getElementById('alertaRec').textContent = '';
+    document.getElementById('recPasso1').style.display = 'block';
+    document.getElementById('recPasso2').style.display = 'none';
+    document.getElementById('modalRecuperacao').classList.add('open');
+}
+
+function fecharRecuperacao(e) {
+    // Fecha só se clicar no overlay ou no botão de fechar (não dentro da box)
+    if (e && e.target !== document.getElementById('modalRecuperacao')) return;
+    document.getElementById('modalRecuperacao').classList.remove('open');
+}
+
+async function enviarRecuperacao() {
+    const email = document.getElementById('recEmail').value.trim();
+    const alertaEl = document.getElementById('alertaRec');
+
+    alertaEl.className = 'alerta';
+    alertaEl.textContent = '';
+
+    if (!email || !email.includes('@')) {
+        alertaEl.className = 'alerta erro';
+        alertaEl.textContent = 'Informe um e-mail válido.';
+        return;
+    }
+
+    const btn = document.getElementById('btnEnviarRec');
+    btn.disabled = true;
+    btn.textContent = '⏳ Enviando...';
+
+    try {
+        const res = await fetch('http://localhost:3000/api/recuperar-senha', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            alertaEl.className = 'alerta erro';
+            alertaEl.textContent = data.erro || 'Erro ao processar solicitação.';
+            return;
+        }
+
+        // Exibe passo 2 (confirmação)
+        document.getElementById('recEmailConfirm').textContent = email;
+        document.getElementById('recPasso1').style.display = 'none';
+        document.getElementById('recPasso2').style.display = 'block';
+
+    } catch {
+        alertaEl.className = 'alerta erro';
+        alertaEl.textContent = 'Não foi possível conectar ao servidor.';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enviar instruções';
+    }
 }
 
 async function submeter() {
@@ -111,7 +178,14 @@ async function submeter() {
             localStorage.setItem('ni_token', data.token);
             localStorage.setItem('ni_usuario', JSON.stringify(data.usuario));
             mostrarAlerta('sucesso', ' Login realizado! Redirecionando...');
-            setTimeout(() => { window.location.href = 'pages/dashboard.html'; }, 600);
+
+            const ROTAS_POR_PERFIL = {
+                colaborador: 'pages/dashboard.html',
+                gestor:      'pages/gestor-ideias.html',
+                admin:       'pages/gestao-usuarios.html',
+            };
+            const destino = ROTAS_POR_PERFIL[data.usuario.tipo] || 'pages/dashboard.html';
+            setTimeout(() => { window.location.href = destino; }, 600);
         }
 
     } catch (err) {

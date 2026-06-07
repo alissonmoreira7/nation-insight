@@ -4,11 +4,14 @@ const cors    = require('cors');
 
 const auth         = require('./middleware/auth');
 const checkAdmin   = require('./middleware/checkAdmin');
+const checkGestor  = require('./middleware/checkGestor');
 const authCtrl     = require('./controllers/authController');
 const ideiaCtrl    = require('./controllers/ideiaController');
 const recompCtrl   = require('./controllers/recompensaController');
 const dashCtrl     = require('./controllers/dashboardController');
-const adminCtrl    = require('./controllers/adminController');
+const adminCtrl    = require('./controllers/Admincontroller');
+const gestorCtrl   = require('./controllers/Gestorcontroller');
+const senhaCtrl    = require('./controllers/senhaController');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -22,48 +25,47 @@ app.post('/api/auth/login',     authCtrl.login);
 app.get ('/api/auth/perfil',    auth, authCtrl.obterPerfil);
 app.put ('/api/auth/perfil',    auth, authCtrl.atualizarPerfil);
 
-// ── IDEIAS (requer token) ─────────────────────────────────────────────────────
-app.get   ('/api/ideias/minhas',       auth, ideiaCtrl.minhasIdeias);
-app.post  ('/api/ideias',              auth, ideiaCtrl.criarIdeia);
-app.put   ('/api/ideias/:id',          auth, ideiaCtrl.editarIdeia);
-app.delete('/api/ideias/:id',          auth, ideiaCtrl.excluirIdeia);
-app.patch ('/api/ideias/:id/status',   auth, ideiaCtrl.atualizarStatus);
+// ── RECUPERAÇÃO DE SENHA (públicas) ──────────────────────────────────────────
+app.post('/api/recuperar-senha',           senhaCtrl.recuperarSenha);
+app.post('/api/recuperar-senha/confirmar', senhaCtrl.confirmarSenha);
 
-// ── RECOMPENSAS (requer token) ────────────────────────────────────────────────
-app.get ('/api/recompensas',              auth, recompCtrl.listarRecompensas);
-app.get ('/api/recompensas/historico',    auth, recompCtrl.historico);
-app.post('/api/recompensas/:id/resgatar', auth, recompCtrl.resgatar);
+// ── IDEIAS (colaborador) ──────────────────────────────────────────────────────
+app.get   ('/api/ideias/minhas',     auth, ideiaCtrl.minhasIdeias);
+app.post  ('/api/ideias',            auth, ideiaCtrl.criarIdeia);
+app.put   ('/api/ideias/:id',        auth, ideiaCtrl.editarIdeia);
+app.delete('/api/ideias/:id',        auth, ideiaCtrl.excluirIdeia);
+app.patch ('/api/ideias/:id/status', auth, ideiaCtrl.atualizarStatus);
 
-// ── DASHBOARD (requer token) ──────────────────────────────────────────────────
-app.get('/api/dashboard', auth, dashCtrl.getDashboard);
+// ── COMENTÁRIOS — qualquer usuário autenticado ────────────────────────────────
+app.post('/api/ideias/:id/comentarios', auth, gestorCtrl.comentarIdeia);
 
-// ── ADMIN — gestão de usuários (requer token + perfil admin/gestor) ───────────
+// ── GESTOR — ideias do próprio departamento ───────────────────────────────────
+app.get  ('/api/gestor/ideias',            auth, checkGestor, gestorCtrl.listarIdeiasDepartamento);
+app.patch('/api/gestor/ideias/:id/status', auth, checkGestor, gestorCtrl.avaliarIdeia);
+
+// ── ADMIN — todas as ideias + implementar ─────────────────────────────────────
+app.get  ('/api/admin/ideias',            auth, checkAdmin, gestorCtrl.listarTodasIdeias);
+app.patch('/api/admin/ideias/:id/status', auth, checkAdmin, gestorCtrl.implementarIdeia);
+
+// ── ADMIN — gestão de usuários ────────────────────────────────────────────────
 app.get   ('/api/admin/usuarios',     auth, checkAdmin, adminCtrl.listarUsuarios);
 app.post  ('/api/admin/usuarios',     auth, checkAdmin, adminCtrl.criarUsuario);
 app.put   ('/api/admin/usuarios/:id', auth, checkAdmin, adminCtrl.editarUsuario);
 app.delete('/api/admin/usuarios/:id', auth, checkAdmin, adminCtrl.excluirUsuario);
 app.get   ('/api/admin/stats',        auth, checkAdmin, adminCtrl.stats);
+app.get   ('/api/admin/setores',      auth, checkAdmin, adminCtrl.listarSetores);
+
+// ── RECOMPENSAS ───────────────────────────────────────────────────────────────
+app.get ('/api/recompensas',              auth, recompCtrl.listarRecompensas);
+app.get ('/api/recompensas/historico',    auth, recompCtrl.historico);
+app.post('/api/recompensas/:id/resgatar', auth, recompCtrl.resgatar);
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+app.get('/api/dashboard', auth, dashCtrl.getDashboard);
 
 app.get('/', (_, res) => res.json({ status: 'NationInsight API online' }));
-
 app.use((req, res) => res.status(404).json({ erro: `Rota ${req.path} não encontrada` }));
 
 app.listen(PORT, () => {
-  console.log(`\n NationInsight API → http://localhost:${PORT}`);
-  console.log(' Rotas:');
-  console.log('   POST /api/auth/registrar');
-  console.log('   POST /api/auth/login');
-  console.log('   GET  /api/ideias/minhas');
-  console.log('   POST /api/ideias');
-  console.log('   PUT  /api/ideias/:id');
-  console.log('   DEL  /api/ideias/:id');
-  console.log('   GET  /api/recompensas');
-  console.log('   GET  /api/recompensas/historico');
-  console.log('   POST /api/recompensas/:id/resgatar');
-  console.log('   GET  /api/dashboard');
-  console.log('   GET  /api/admin/usuarios   (admin/gestor)');
-  console.log('   POST /api/admin/usuarios   (admin/gestor)');
-  console.log('   PUT  /api/admin/usuarios/:id (admin/gestor)');
-  console.log('   DEL  /api/admin/usuarios/:id (admin/gestor)');
-  console.log('   GET  /api/admin/stats      (admin/gestor)\n');
+  console.log(`\n NationInsight API → http://localhost:${PORT}\n`);
 });

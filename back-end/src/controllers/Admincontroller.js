@@ -2,6 +2,19 @@
 const bcrypt = require('bcryptjs');
 const pool   = require('../database/connection');
 
+// GET /api/admin/setores
+async function listarSetores(req, res) {
+  try {
+    const [rows] = await pool.query(
+      'SELECT IdCod_set AS id, Nome_set AS nome, Descricao_set AS descricao FROM tab_setor ORDER BY Nome_set ASC'
+    );
+    return res.json(rows);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ erro: 'Erro ao listar setores' });
+  }
+}
+
 // GET /api/admin/usuarios
 async function listarUsuarios(req, res) {
   try {
@@ -12,6 +25,7 @@ async function listarUsuarios(req, res) {
         Email_usu       AS email,
         perfilacesso_usu AS perfil,
         cargo_usu       AS cargo,
+        Departamento_usu AS departamento,
         saldoPontos_usu AS pontos,
         created_at
       FROM tab_usuario
@@ -26,7 +40,7 @@ async function listarUsuarios(req, res) {
 
 // POST /api/admin/usuarios
 async function criarUsuario(req, res) {
-  const { nome, email, senha, perfil = 'colaborador', cargo = 'Colaborador' } = req.body;
+  const { nome, email, senha, perfil = 'colaborador', cargo = 'Colaborador', departamento = '' } = req.body;
 
   if (!nome || !email || !senha)
     return res.status(400).json({ erro: 'Nome, email e senha são obrigatórios' });
@@ -44,15 +58,15 @@ async function criarUsuario(req, res) {
     const hash = await bcrypt.hash(senha, Number(process.env.BCRYPT_ROUNDS) || 10);
 
     const [result] = await pool.query(
-      `INSERT INTO tab_usuario (Nome_usu, Email_usu, senha_usu, perfilacesso_usu, cargo_usu, saldoPontos_usu)
-       VALUES (?, ?, ?, ?, ?, 0)`,
-      [nome, email, hash, perfil, cargo]
+      `INSERT INTO tab_usuario (Nome_usu, Email_usu, senha_usu, perfilacesso_usu, cargo_usu, Departamento_usu, saldoPontos_usu)
+       VALUES (?, ?, ?, ?, ?, ?, 0)`,
+      [nome, email, hash, perfil, cargo, departamento]
     );
 
     return res.status(201).json({
       mensagem: 'Usuário criado com sucesso',
       id: result.insertId,
-      usuario: { id: result.insertId, nome, email, perfil, cargo, pontos: 0 }
+      usuario: { id: result.insertId, nome, email, perfil, cargo, departamento, pontos: 0 }
     });
   } catch (err) {
     console.error(err);
@@ -62,7 +76,7 @@ async function criarUsuario(req, res) {
 
 // PUT /api/admin/usuarios/:id
 async function editarUsuario(req, res) {
-  const { nome, cargo, perfil, pontos } = req.body;
+  const { nome, cargo, perfil, pontos, departamento } = req.body;
 
   // Admin não pode rebaixar a si mesmo
   if (String(req.params.id) === String(req.usuario.id) && perfil && perfil !== req.usuario.tipo)
@@ -77,10 +91,11 @@ async function editarUsuario(req, res) {
     const campos = [];
     const vals   = [];
 
-    if (nome   !== undefined) { campos.push('Nome_usu = ?');         vals.push(nome); }
-    if (cargo  !== undefined) { campos.push('cargo_usu = ?');        vals.push(cargo); }
-    if (perfil !== undefined) { campos.push('perfilacesso_usu = ?'); vals.push(perfil); }
-    if (pontos !== undefined) { campos.push('saldoPontos_usu = ?');  vals.push(pontos); }
+    if (nome   !== undefined) { campos.push('Nome_usu = ?');          vals.push(nome); }
+    if (cargo  !== undefined) { campos.push('cargo_usu = ?');         vals.push(cargo); }
+    if (perfil !== undefined) { campos.push('perfilacesso_usu = ?');  vals.push(perfil); }
+    if (pontos !== undefined) { campos.push('saldoPontos_usu = ?');   vals.push(pontos); }
+    if (departamento !== undefined) { campos.push('Departamento_usu = ?'); vals.push(departamento); }
 
     if (!campos.length) return res.status(400).json({ erro: 'Nenhum campo para atualizar' });
 
@@ -132,4 +147,4 @@ async function stats(req, res) {
   }
 }
 
-module.exports = { listarUsuarios, criarUsuario, editarUsuario, excluirUsuario, stats };
+module.exports = { listarUsuarios, criarUsuario, editarUsuario, excluirUsuario, stats, listarSetores };

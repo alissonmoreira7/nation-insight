@@ -50,12 +50,47 @@
         </div>
 
         <button class="btn-login" id="btnSubmit" onclick="submeter()">Entrar</button>
-        <div class="divider">ou</div>
+        
+         <!-- Link "Esqueci minha senha" — visível só no modo login -->
+        <div class="form-options" id="opcoesLogin">
+          <span></span>
+          <a href="#" class="form-forgot" onclick="abrirRecuperacao(event)">Esqueci minha senha</a>
+        </div>
+
+        <!-- <div class="divider">ou</div>
 
         <div class="form-footer">
           <span id="footerTexto">Não tem conta?</span>
           <a href="#" id="btnAlternar" onclick="alternarModo(event)">Criar conta</a>
+        </div> -->
+    </div>
+
+    <!-- ── MODAL RECUPERAR SENHA ── -->
+    <div class="modal-rec-overlay" id="modalRecuperacao" onclick="fecharRecuperacao(event)">
+      <div class="modal-rec-box">
+        <button class="modal-rec-close" onclick="fecharRecuperacao()">✕</button>
+
+        <!-- Passo 1: solicitar e-mail -->
+        <div id="recPasso1">
+          <div class="modal-rec-icon">🔐</div>
+          <div class="modal-rec-titulo">Recuperar senha</div>
+          <div class="modal-rec-sub">Digite seu e-mail cadastrado e enviaremos as instruções de redefinição.</div>
+          <div class="alerta" id="alertaRec"></div>
+          <div class="form-group" style="margin-top:16px">
+            <label>E-mail</label>
+            <input type="email" id="recEmail" placeholder="seu@email.com" autocomplete="email">
+          </div>
+          <button class="btn-login" id="btnEnviarRec" onclick="enviarRecuperacao()">Enviar instruções</button>
         </div>
+
+        <!-- Passo 2: confirmação enviada -->
+        <div id="recPasso2" style="display:none;text-align:center">
+          <div class="modal-rec-icon">📬</div>
+          <div class="modal-rec-titulo">Verifique seu e-mail</div>
+          <div class="modal-rec-sub">Se o endereço <strong id="recEmailConfirm"></strong> estiver cadastrado, você receberá as instruções em breve.<br><br>Não recebeu? Verifique a pasta de spam.</div>
+          <button class="btn-login" style="margin-top:24px" onclick="fecharRecuperacao()">Fechar</button>
+        </div>
+      </div>
     </div>
 
     <script src="js/api.js"></script>
