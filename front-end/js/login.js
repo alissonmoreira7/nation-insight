@@ -1,7 +1,5 @@
 let modoAtual = 'login'; // 'login' | 'cadastro'
 
-const backend = import.meta.env.VITE_BACKEND;
-
 // Permite Enter para submeter
 document.addEventListener('keydown', e => {
     if (e.key === 'Enter') submeter();
