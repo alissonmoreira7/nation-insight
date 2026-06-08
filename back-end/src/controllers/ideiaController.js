@@ -124,6 +124,28 @@ async function criarIdeia(req, res) {
   }
 }
 
+// GET /api/ideias/:id/comentarios
+async function listarComentarios(req, res) {
+  try {
+    const [rows] = await pool.query(
+      `SELECT
+         c.IdCod_com  AS id,
+         c.Texto_com  AS texto,
+         c.created_at AS data,
+         u.Nome_usu   AS autorNome
+       FROM tab_comentario c
+       INNER JOIN tab_usuario u ON c.IdCod_usu = u.IdCod_usu
+       WHERE c.IdCod_ide = ?
+       ORDER BY c.created_at ASC`,
+      [req.params.id]
+    );
+    return res.json(rows);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ erro: 'Erro ao buscar comentários' });
+  }
+}
+
 // PUT /api/ideias/:id  (edição pelo colaborador — sem alteração de pontos)
 async function editarIdeia(req, res) {
   const { titulo, categoria, desc, prazo, recursos } = req.body;
@@ -260,4 +282,4 @@ async function excluirIdeia(req, res) {
   }
 }
 
-module.exports = { minhasIdeias, criarIdeia, editarIdeia, atualizarStatus, excluirIdeia };
+module.exports = { minhasIdeias, criarIdeia, editarIdeia, atualizarStatus, excluirIdeia, listarComentarios };

@@ -64,18 +64,27 @@
         const el     = (id) => document.getElementById(id);
         const perfil = String(usu.tipo || usu.perfilacesso_usu || usu.perfil || '').toLowerCase();
 
-        // Preenche dados do usuário
+        // ── Mapa de dashboard por perfil ──────────────────────────────────────
+        const DASHBOARD = {
+            'colaborador': 'dashboard-colaborador.html',
+            'gestor':      'dashboard.html',
+            'admin':       'dashboard.html',
+        };
+
+        // Aponta o link do dashboard para a página correta do perfil logado
+        const linkDash = el('nav-dashboard');
+        if (linkDash) linkDash.href = DASHBOARD[perfil] || 'dashboard.html';
+
+        // ── Dados do usuário no rodapé ────────────────────────────────────────
         if (el('sidebarNome'))           el('sidebarNome').textContent           = usu.nome     || 'Usuário';
         if (el('sidebarCargo'))          el('sidebarCargo').textContent          = usu.cargo    || 'Colaborador';
         if (el('sidebarAvatarIniciais')) el('sidebarAvatarIniciais').textContent = usu.iniciais || '??';
 
-        // Esconde TUDO que não é padrão e depois mostra o que cada perfil precisa
         const show = (id) => { const a = el(id); if (a) a.style.display = 'flex'; };
         const hide = (id) => { const a = el(id); if (a) a.style.display = 'none';  };
 
         if (perfil === 'colaborador') {
-            // dashboard ✔ | minhas ideias ✔ | recompensas ✔ | configurações ✔
-            // (todos visíveis por padrão — nada a fazer)
+        // dashboard ✔ | minhas ideias ✔ | recompensas ✔ | configurações ✔
 
         } else if (perfil === 'gestor') {
             // dashboard ✔ | minhas ideias ✔ | gestão ideias ✔ | recompensas ✔ | configurações ✔
@@ -89,16 +98,19 @@
             show('nav-admin-usuarios');
         }
 
-        // Marca item ativo com base na URL atual
+        // ── Marca item ativo pela URL atual ───────────────────────────────────
         const paginaAtual = window.location.pathname.split('/').pop();
+
         const mapaAtivo = {
-            'dashboard.html':       'nav-dashboard',
-            'ideias.html':          'nav-ideias',
-            'gestor-ideias.html':   perfil === 'admin' ? 'nav-admin-ideias' : 'nav-gestao-ideias',
-            'gestao-usuarios.html': 'nav-admin-usuarios',
-            'recompensas.html':     'nav-recompensas',
-            'configuracoes.html':   'nav-configuracoes',
+            'dashboard-colaborador.html': 'nav-dashboard',
+            'dashboard.html':             'nav-dashboard',
+            'ideias.html':                'nav-ideias',
+            'gestor-ideias.html':         perfil === 'admin' ? 'nav-admin-ideias' : 'nav-gestao-ideias',
+            'gestao-usuarios.html':       'nav-admin-usuarios',
+            'recompensas.html':           'nav-recompensas',
+            'configuracoes.html':         'nav-configuracoes',
         };
+
         const idAtivo = mapaAtivo[paginaAtual];
         if (idAtivo && el(idAtivo)) el(idAtivo).classList.add('active');
 

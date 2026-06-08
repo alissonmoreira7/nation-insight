@@ -201,11 +201,49 @@
       </div>
     </div>
 
-    <!-- Scripts — ordem importa: api.js antes, gestao-ideias.js por último -->
-    <script src="../js/api.js"></script>
-    <script src="../js/injetahtml.js"></script>
-    <script src="../js/gestao-ideias.js"></script>
-    <script>
+  <!-- ══════════════════════════════════════════════════════════
+    SNIPPET: colar antes de </body> em gestor-ideias.html
+    e em qualquer outra página que use comentarios-modal.js
+  ═══════════════════════════════════════════════════════════ -->
+
+  <!-- Modal VER comentários (leitura) -->
+  <div class="modal-backdrop" id="modalVerComentarios">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <div class="modal-box__header">
+        <span class="modal-box__titulo" id="modalComentariosTitulo">Comentários</span>
+        <button class="modal-box__close" onclick="fecharModalComentarios()">✕</button>
+      </div>
+      <div class="modal-box__body">
+        <div id="listaComentarios"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CSS inline mínimo (mesclar no seu CSS ou deixar aqui) -->
+  <style>
+    .modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1000; align-items:center; justify-content:center; }
+    .modal-backdrop.aberto { display:flex; }
+    .modal-box { background:#fff; border-radius:14px; padding:28px 28px 20px; width:100%; max-width:460px; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 8px 40px rgba(0,0,0,.18); }
+    .modal-box__header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .modal-box__titulo { font-size:1rem; font-weight:600; }
+    .modal-box__close  { background:none; border:none; cursor:pointer; font-size:1.1rem; color:#888; }
+    .modal-box__body   { overflow-y:auto; flex:1; }
+    .coment-item   { border-bottom:1px solid #f0f0f0; padding:12px 0; }
+    .coment-item:last-child { border-bottom:none; }
+    .coment-header { display:flex; justify-content:space-between; margin-bottom:4px; }
+    .coment-autor  { font-weight:600; font-size:.85rem; color:#374151; }
+    .coment-data   { font-size:.75rem; color:#9ca3af; }
+    .coment-texto  { font-size:.88rem; color:#4b5563; margin:0; line-height:1.5; }
+    .coment-loading,.coment-vazio,.coment-erro { text-align:center; color:#9ca3af; font-size:.88rem; padding:24px 0; }
+    .coment-erro { color:#c0392b; }
+  </style>
+
+      <!-- Scripts — ordem importa: api.js antes, gestao-ideias.js por último -->
+      <script src="../js/api.js"></script>
+      <script src="../js/injetahtml.js"></script>
+      <script src="../js/gestao-ideias.js"></script>
+      
+      <script>
       carregarComponente('../components/sidebar.html', 'sidebar-container');
       carregarComponente('../components/topbar.html',  'topbar-container');
     </script>

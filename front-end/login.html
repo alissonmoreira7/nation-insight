@@ -107,73 +107,73 @@
 
       // Captura a posição do mouse
       let mouse = {
-          x: null,
-          y: null,
-          radius: 120 // Área de atração do mouse
+        x: null,
+        y: null,
+        radius: 120 // Área de atração do mouse
       };
 
       window.addEventListener('mousemove', function(event) {
-          mouse.x = event.x;
-          mouse.y = event.y;
+        mouse.x = event.x;
+        mouse.y = event.y;
       });
 
       // Remove a atração se o mouse sair da tela
       window.addEventListener('mouseout', function() {
-          mouse.x = undefined;
-          mouse.y = undefined;
+        mouse.x = undefined;
+        mouse.y = undefined;
       });
 
       // Classe que cria cada bolinha
       class Particle {
-          constructor(x, y, directionX, directionY, size, color) {
-              this.x = x;
-              this.y = y;
-              this.directionX = directionX;
-              this.directionY = directionY;
-              this.size = size;
-              this.color = color;
-              this.baseX = this.x;
-              this.baseY = this.y;
-              this.density = (Math.random() * 30) + 1; // Peso da bolinha
+        constructor(x, y, directionX, directionY, size, color) {
+          this.x = x;
+          this.y = y;
+          this.directionX = directionX;
+          this.directionY = directionY;
+          this.size = size;
+          this.color = color;
+          this.baseX = this.x;
+          this.baseY = this.y;
+          this.density = (Math.random() * 30) + 1; // Peso da bolinha
+        }
+
+        // Desenha a bolinha na tela
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        }
+
+        // Atualiza a posição e faz a interação com o mouse
+        update() {
+          // Verifica colisão com as bordas para elas quicarem
+          if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+          if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+
+          // Matemática de atração do mouse
+          let dx = mouse.x - this.x;
+          let dy = mouse.y - this.y;
+          let distance = Math.sqrt(dx * dx + dy * dy);
+          
+          let forceDirectionX = dx / distance;
+          let forceDirectionY = dy / distance;
+          let maxDistance = mouse.radius;
+          let force = (maxDistance - distance) / maxDistance;
+          let directionX = forceDirectionX * force * this.density;
+          let directionY = forceDirectionY * force * this.density;
+
+          if (distance < mouse.radius) {
+            this.x += directionX;
+            this.y += directionY;
+          } else {
+            // Movimento natural solto
+            this.x += this.directionX;
+            this.y += this.directionY;
           }
 
-          // Desenha a bolinha na tela
-          draw() {
-              ctx.beginPath();
-              ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-              ctx.fillStyle = this.color;
-              ctx.fill();
-          }
-
-          // Atualiza a posição e faz a interação com o mouse
-          update() {
-              // Verifica colisão com as bordas para elas quicarem
-              if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
-              if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
-
-              // Matemática de atração do mouse
-              let dx = mouse.x - this.x;
-              let dy = mouse.y - this.y;
-              let distance = Math.sqrt(dx * dx + dy * dy);
-              
-              let forceDirectionX = dx / distance;
-              let forceDirectionY = dy / distance;
-              let maxDistance = mouse.radius;
-              let force = (maxDistance - distance) / maxDistance;
-              let directionX = forceDirectionX * force * this.density;
-              let directionY = forceDirectionY * force * this.density;
-
-              if (distance < mouse.radius) {
-                  this.x += directionX;
-                  this.y += directionY;
-              } else {
-                  // Movimento natural solto
-                  this.x += this.directionX;
-                  this.y += this.directionY;
-              }
-
-              this.draw();
-          }
+          this.draw();
+        }
       }
 
       // Inicializa o vetor de bolinhas

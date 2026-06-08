@@ -180,9 +180,9 @@ async function submeter() {
             mostrarAlerta('sucesso', ' Login realizado! Redirecionando...');
 
             const ROTAS_POR_PERFIL = {
-                colaborador: 'pages/dashboard.html',
-                gestor:      'pages/gestor-ideias.html',
-                admin:       'pages/gestao-usuarios.html',
+                colaborador: 'pages/dashboard-colaborador.html',
+                gestor:      'pages/dashboard.html',
+                admin:       'pages/dashboard.html',
             };
             const destino = ROTAS_POR_PERFIL[data.usuario.tipo] || 'pages/dashboard.html';
             setTimeout(() => { window.location.href = destino; }, 600);
