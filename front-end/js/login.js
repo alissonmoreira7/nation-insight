@@ -1,5 +1,7 @@
 let modoAtual = 'login'; // 'login' | 'cadastro'
 
+const backend = import.meta.env.VITE_BACKEND;
+
 // Permite Enter para submeter
 document.addEventListener('keydown', e => {
     if (e.key === 'Enter') submeter();
@@ -71,7 +73,7 @@ async function enviarRecuperacao() {
     btn.textContent = '⏳ Enviando...';
 
     try {
-        const res = await fetch('http://localhost:3000/api/recuperar-senha', {
+        const res = await fetch(`${backend}/api/recuperar-senha`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email }),
@@ -145,7 +147,7 @@ async function submeter() {
     try {
         if (modoAtual === 'cadastro') {
             // Cria conta
-            const res = await fetch('http://localhost:3000/api/auth/registrar', {
+            const res = await fetch(`${backend}/api/auth/registrar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nome, email, senha }) 
@@ -162,7 +164,7 @@ async function submeter() {
 
         } else {
             // Login
-            const res = await fetch('http://localhost:3000/api/auth/login', {
+            const res = await fetch(`${backend}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, senha })
