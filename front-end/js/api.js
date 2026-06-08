@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:3000/api'; // ← troque pela URL do deploy
+const backend = import.meta.env.VITE_BACKEND;
+const API_URL = `${backend}/api`; // ← troque pela URL do deploy
 
 // ── TOKEN / SESSÃO ────────────────────────────────────────────────────────────
 function getToken()    { return localStorage.getItem('ni_token'); }
